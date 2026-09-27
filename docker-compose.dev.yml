@@ -47,6 +47,8 @@ services:
       - ./web/vite.config.js:/app/vite.config.js
       - ./web/vite-plugin-api-client.js:/app/vite-plugin-api-client.js
       - ./web/scripts:/app/scripts
+      # local-only until @metacentrum/design-system is published
+      - ../metacentrum-design:/metacentrum-design
     networks:
       - pbsmon-dev-network
     command: npm run dev -- --host 0.0.0.0

@@ -1,3 +1,11 @@
+/* Unlayered CSS always beats layered CSS, so `carbon` goes first to keep
+   Carbon's reset from overriding Tailwind. Header.css stays unlayered -
+   it's scoped to .mc-header/.cds--* and needs to beat Tailwind's preflight. */
+@layer carbon, theme, base, components, utilities;
+
+@import "@metacentrum/design-system/tokens.css";
+@import "@metacentrum/design-system/foundation.css" layer(carbon);
+@import "@metacentrum/design-system/styles.css";
 @import "tailwindcss";
 
 html {

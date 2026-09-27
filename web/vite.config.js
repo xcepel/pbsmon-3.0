@@ -10,5 +10,7 @@ export default defineConfig({
     alias: {
       "@": path.resolve(__dirname, "src"),
     },
+    // avoids a duplicate React copy from the linked design-system package
+    dedupe: ["react", "react-dom"],
   },
 });

@@ -49,11 +49,11 @@ export function DataFreshnessFooter() {
   ];
 
   return (
-    <div className="mt-auto px-[14px] py-2 border-t border-primary-700/50 text-xs leading-tight text-white select-none">
+    <div className="px-4 py-2 border-t border-gray-200 text-xs leading-tight text-gray-500 select-none">
       {lines.map(({ label, timestamp }) => (
         <div
           key={label}
-          className="truncate"
+          className="inline-block mr-4"
           title={
             timestamp !== undefined ? new Date(timestamp).toLocaleString() : undefined
           }

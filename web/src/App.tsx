@@ -4,7 +4,7 @@ import {
   Route,
   Navigate,
 } from "react-router-dom";
-import { SidebarLayout } from "@/components/layout/SidebarLayout";
+import { AppLayout } from "@/components/layout/AppLayout";
 import { PersonalViewPage } from "@/pages/PersonalViewPage";
 import { MachinesPage } from "@/pages/MachinesPage";
 import { MachineDetailPage } from "@/pages/MachineDetailPage";
@@ -30,7 +30,7 @@ export default function App() {
     <ImpersonationProvider>
       <Router>
         <Routes>
-          <Route path="/" element={<SidebarLayout />}>
+          <Route path="/" element={<AppLayout />}>
             <Route index element={<Navigate to="/personal-view" replace />} />
             <Route path="personal-view" element={<PersonalViewPage />} />
             <Route path="qsub-assembler" element={<QsubAssemblerPage />} />
