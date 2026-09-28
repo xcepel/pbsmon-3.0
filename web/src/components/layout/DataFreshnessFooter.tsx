@@ -49,18 +49,19 @@ export function DataFreshnessFooter() {
   ];
 
   return (
-    <div className="px-4 py-2 border-t border-gray-200 text-xs leading-tight text-gray-500 select-none">
-      {lines.map(({ label, timestamp }) => (
-        <div
-          key={label}
-          className="inline-block mr-4"
-          title={
-            timestamp !== undefined ? new Date(timestamp).toLocaleString() : undefined
-          }
-        >
-          {label}: {formatAge(timestamp, t)}
-        </div>
+    <>
+      {lines.map(({ label, timestamp }, index) => (
+        <span key={label}>
+          {index > 0 && " · "}
+          <span
+            title={
+              timestamp !== undefined ? new Date(timestamp).toLocaleString() : undefined
+            }
+          >
+            {label}: {formatAge(timestamp, t)}
+          </span>
+        </span>
       ))}
-    </div>
+    </>
   );
 }

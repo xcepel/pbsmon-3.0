@@ -3,7 +3,7 @@ import type { AnchorHTMLAttributes } from "react";
 import { Link, Outlet, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Icon } from "@iconify/react";
-import { Header, type HeaderNavItem } from "@metacentrum/design-system";
+import { Footer, Header, type HeaderNavItem } from "@metacentrum/design-system";
 // design-system CSS is imported in app.css (needs a layer() qualifier)
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { ImpersonationBanner } from "@/components/common/ImpersonationBanner";
@@ -198,7 +198,7 @@ export function AppLayout() {
         )}
       </main>
 
-      <DataFreshnessFooter />
+      <Footer info={<DataFreshnessFooter />} />
       <ImpersonationBanner />
     </div>
   );
