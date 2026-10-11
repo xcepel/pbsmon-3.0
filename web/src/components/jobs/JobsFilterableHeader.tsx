@@ -1,13 +1,16 @@
 import { useTranslation } from "react-i18next";
 
+// The file keeps its old name because JobFilterableState is imported from here
+// by the queue/machine/user detail pages. The filter itself used to sit in the
+// Status column header; with the shared DataTable it lives in the table toolbar.
+
 export type JobFilterableState = "all" | "Q" | "R|B" | "C|F|X" | "E" | "H" | "S" | "T|M" | "W";
 
-interface JobsFilterableHeaderProps {
+interface JobsStateFilterProps {
   filterableStates?: Record<string, string> | null;
   stateFilter?: JobFilterableState;
   onStateFilterChange?: (state: JobFilterableState) => void;
 }
-
 
 function convertPbsStateToFilterableState(pbsState: string): JobFilterableState {
   const state = pbsState?.toUpperCase() || 'all';
@@ -38,11 +41,11 @@ function convertPbsStateToFilterableState(pbsState: string): JobFilterableState 
   }
 }
 
-export function JobsFilterableHeader({
+export function JobsStateFilter({
   filterableStates,
   stateFilter,
   onStateFilterChange,
-}: JobsFilterableHeaderProps) {
+}: JobsStateFilterProps) {
   const { t } = useTranslation();
   const stateOptions: { value: JobFilterableState; label: string }[] = [
     { value: "all", label: t("jobs.all") },
@@ -64,21 +67,22 @@ export function JobsFilterableHeader({
   ];
 
   return (
-        <div className="flex items-center min-w-0 w-full">
-          <select
-            value={stateFilter || "all"}
-            onChange={(e) => {
-              const newFilter = e.target.value as JobFilterableState;
-              onStateFilterChange?.(newFilter);
-            }}
-            className="w-full min-w-0 text-sm bg-white border border-gray-200 rounded-md shadow-sm cursor-pointer hover:border-gray-500 focus:ring-primary-500 focus:border-primary-500"
-          >
-            {stateOptions.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
-        </div>
+    <label className="flex items-center gap-2 px-4 text-sm text-gray-600 whitespace-nowrap">
+      <span>{t("jobs.stateLabel")}</span>
+      <select
+        value={stateFilter || "all"}
+        onChange={(e) => {
+          const newFilter = e.target.value as JobFilterableState;
+          onStateFilterChange?.(newFilter);
+        }}
+        className="min-w-[8rem] text-sm bg-white border border-gray-200 rounded-md shadow-sm cursor-pointer hover:border-gray-500 focus:ring-primary-500 focus:border-primary-500"
+      >
+        {stateOptions.map((option) => (
+          <option key={option.value} value={option.value}>
+            {option.label}
+          </option>
+        ))}
+      </select>
+    </label>
   );
 }

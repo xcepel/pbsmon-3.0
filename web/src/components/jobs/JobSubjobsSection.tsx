@@ -1,6 +1,9 @@
 import { useTranslation } from "react-i18next";
 import type { SubjobDTO } from "@/lib/generated-api";
 import { Link } from "react-router-dom";
+import { DataTable, type DataTableColumn } from "@metacentrum/design-system";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
+import { formatSecondsToTime } from "./jobsTableColumns";
 
 interface JobSubjobsSectionProps {
   subjobs: SubjobDTO[];
@@ -9,15 +12,118 @@ interface JobSubjobsSectionProps {
 export function JobSubjobsSection({ subjobs }: JobSubjobsSectionProps) {
   const { t } = useTranslation();
 
-  // Format seconds to HH:MM:SS
-  const formatSecondsToTime = (seconds: number): string => {
-    const hours = Math.floor(seconds / 3600);
-    const minutes = Math.floor((seconds % 3600) / 60);
-    const secs = Math.floor(seconds % 60);
-    return `${hours.toString().padStart(2, "0")}:${minutes
-      .toString()
-      .padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
-  };
+  // Below the sm breakpoint only ID and state are shown (as before)
+  const isNarrow = useMediaQuery("(max-width: 639px)");
+
+  const columns: DataTableColumn<SubjobDTO>[] = [
+    {
+      key: "id",
+      header: t("jobs.subjobId"),
+      render: (subjob) => (
+        <Link
+          to={`/jobs/${subjob.id}`}
+          className="whitespace-nowrap text-sm font-medium font-mono text-primary-600 hover:text-primary-800"
+        >
+          {subjob.id}
+        </Link>
+      ),
+    },
+    {
+      key: "state",
+      header: t("jobs.stateLabel"),
+      render: (subjob) => (
+        <span
+          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium whitespace-nowrap ${
+            (subjob as any).stateColor || "bg-gray-100 text-gray-800"
+          }`}
+        >
+          {String(
+            t(
+              `jobs.state.${String((subjob as any).stateName || subjob.state || "")}`,
+              {
+                default: String((subjob as any).stateName || subjob.state || ""),
+              }
+            )
+          )}
+        </span>
+      ),
+    },
+  ];
+
+  if (!isNarrow) {
+    columns.push(
+      {
+        key: "node",
+        header: t("jobs.node"),
+        render: (subjob) =>
+          subjob.node ? (
+            <Link
+              to={`/machines/${String(subjob.node)}`}
+              className="whitespace-nowrap text-sm text-primary-600 hover:text-primary-800"
+            >
+              {String(subjob.node)}
+            </Link>
+          ) : (
+            <span className="text-sm text-gray-600">-</span>
+          ),
+      },
+      {
+        key: "cpuReserved",
+        header: t("jobs.cpu"),
+        render: (subjob) => (
+          <span className="text-sm text-gray-600">{Number(subjob.cpuReserved)}</span>
+        ),
+      },
+      {
+        key: "memoryReserved",
+        header: t("jobs.memory"),
+        render: (subjob) => (
+          <span className="whitespace-nowrap text-sm text-gray-600">
+            {Number(subjob.memoryReserved).toFixed(2)} GB
+            {typeof subjob.memoryUsed === "number" && (
+              <span className="text-gray-400 ml-1">
+                ({Number(subjob.memoryUsed).toFixed(2)} GB)
+              </span>
+            )}
+          </span>
+        ),
+      },
+      {
+        key: "cpuTimeUsed",
+        header: t("jobs.cpuTimeUsed"),
+        render: (subjob) => (
+          <span className="whitespace-nowrap text-sm text-gray-600">
+            {String(subjob.cpuTimeUsed || "-")}
+          </span>
+        ),
+      },
+      {
+        key: "runtime",
+        header: t("jobs.runtime"),
+        render: (subjob) => (
+          <span className="whitespace-nowrap text-sm text-gray-600">
+            {typeof subjob.runtime === "number" && subjob.runtime > 0
+              ? formatSecondsToTime(subjob.runtime)
+              : "-"}
+          </span>
+        ),
+      },
+      {
+        key: "exitCode",
+        header: t("jobs.exitCode"),
+        render: (subjob) =>
+          typeof subjob.exitCode === "number" ? (
+            <span
+              className={`text-sm ${subjob.exitCode === 0 ? "text-green-600" : "text-red-600"}`}
+            >
+              {subjob.exitCode}
+            </span>
+          ) : (
+            <span className="text-sm text-gray-600">-</span>
+          ),
+      }
+    );
+  }
 
   if (subjobs.length === 0) {
     return null;
@@ -28,117 +134,7 @@ export function JobSubjobsSection({ subjobs }: JobSubjobsSectionProps) {
       <h2 className="text-lg font-semibold text-gray-900 mb-4">
         {t("jobs.subjobs")} ({subjobs.length})
       </h2>
-      <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                {t("jobs.subjobId")}
-              </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                {t("jobs.stateLabel")}
-              </th>
-              <th className="hidden sm:table-cell px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                {t("jobs.node")}
-              </th>
-              <th className="hidden sm:table-cell px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                {t("jobs.cpu")}
-              </th>
-              <th className="hidden sm:table-cell px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                {t("jobs.memory")}
-              </th>
-              <th className="hidden sm:table-cell px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                {t("jobs.cpuTimeUsed")}
-              </th>
-              <th className="hidden sm:table-cell px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                {t("jobs.runtime")}
-              </th>
-              <th className="hidden sm:table-cell px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                {t("jobs.exitCode")}
-              </th>
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {subjobs.map((subjob) => (
-              <tr key={subjob.id} className="hover:bg-gray-50">
-                <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900 font-mono">
-                  <Link
-                    to={`/jobs/${subjob.id}`}
-                    className="text-primary-600 hover:text-primary-800"
-                  >
-                    {subjob.id}
-                  </Link>
-                </td>
-                <td className="px-4 py-3 whitespace-nowrap text-sm">
-                  <span
-                    className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                      (subjob as any).stateColor || "bg-gray-100 text-gray-800"
-                    }`}
-                  >
-                    {String(
-                      t(
-                        `jobs.state.${String((subjob as any).stateName || subjob.state || "")}`,
-                        {
-                          default: String(
-                            (subjob as any).stateName || subjob.state || ""
-                          ),
-                        }
-                      )
-                    )}
-                  </span>
-                </td>
-                <td className="hidden sm:table-cell px-4 py-3 whitespace-nowrap text-sm text-gray-600">
-                  {subjob.node ? (
-                    <Link
-                      to={`/machines/${String(subjob.node)}`}
-                      className="text-primary-600 hover:text-primary-800"
-                    >
-                      {String(subjob.node)}
-                    </Link>
-                  ) : (
-                    "-"
-                  )}
-                </td>
-                <td className="hidden sm:table-cell px-4 py-3 whitespace-nowrap text-sm text-gray-600">
-                  {Number(subjob.cpuReserved)}
-                </td>
-                <td className="hidden sm:table-cell px-4 py-3 whitespace-nowrap text-sm text-gray-600">
-                  {Number(subjob.memoryReserved).toFixed(2)} GB
-                  {typeof subjob.memoryUsed === "number" &&
-                    subjob.memoryUsed !== null && (
-                      <span className="text-gray-400 ml-1">
-                        ({Number(subjob.memoryUsed).toFixed(2)} GB)
-                      </span>
-                    )}
-                </td>
-                <td className="hidden sm:table-cell px-4 py-3 whitespace-nowrap text-sm text-gray-600">
-                  {String(subjob.cpuTimeUsed || "-")}
-                </td>
-                <td className="hidden sm:table-cell px-4 py-3 whitespace-nowrap text-sm text-gray-600">
-                  {typeof subjob.runtime === 'number' && subjob.runtime > 0 ? formatSecondsToTime(subjob.runtime) : "-"}
-                </td>
-                <td className="hidden sm:table-cell px-4 py-3 whitespace-nowrap text-sm text-gray-600">
-                  {typeof subjob.exitCode === "number" &&
-                  subjob.exitCode !== null &&
-                  subjob.exitCode !== undefined ? (
-                    <span
-                      className={
-                        subjob.exitCode === 0
-                          ? "text-green-600"
-                          : "text-red-600"
-                      }
-                    >
-                      {subjob.exitCode}
-                    </span>
-                  ) : (
-                    "-"
-                  )}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      <DataTable columns={columns} rows={subjobs} rowKey={(subjob) => subjob.id} />
     </div>
   );
 }

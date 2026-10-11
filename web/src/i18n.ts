@@ -8,6 +8,19 @@ i18n.use(initReactI18next).init({
   resources: {
     en: {
       translation: {
+        table: {
+          searchPlaceholder: "Search...",
+          noRecords: "No records",
+          pagination: {
+            itemsPerPage: "Items per page:",
+            itemRange: "{{min}}–{{max}} of {{total}} items",
+            pageRange: "of {{total}} pages",
+            previousPage: "Previous page",
+            nextPage: "Next page",
+            pageSelectLabel: "Page of {{total}} pages",
+            page: "page {{page}}",
+          },
+        },
         pages: {
           personalView: "Personal View",
           qsubAssembler: "Qsub Assembler",
@@ -510,6 +523,19 @@ i18n.use(initReactI18next).init({
     },
     cs: {
       translation: {
+        table: {
+          searchPlaceholder: "Hledat...",
+          noRecords: "Žádné záznamy",
+          pagination: {
+            itemsPerPage: "Položek na stránku:",
+            itemRange: "{{min}}–{{max}} z {{total}} položek",
+            pageRange: "z {{total}} stránek",
+            previousPage: "Předchozí stránka",
+            nextPage: "Následující stránka",
+            pageSelectLabel: "Stránka z {{total}}",
+            page: "stránka {{page}}",
+          },
+        },
         pages: {
           personalView: "Můj přehled",
           qsubAssembler: "Sestavovač úloh (qsub)",

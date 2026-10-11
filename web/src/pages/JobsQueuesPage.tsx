@@ -7,7 +7,16 @@ import { useMediaQuery } from "@/hooks/useMediaQuery";
 import type { QueueListDTO } from "@/lib/generated-api";
 import { QueueTreeNode } from "@/components/common/QueueTreeNode";
 import { QueuesSearchBar } from "@/components/queues/QueuesSearchBar";
-import { PageContainer, PageHeader, ErrorState, LoadingState, EmptyState } from "@metacentrum/design-system";
+import {
+  DataTable,
+  PageContainer,
+  PageHeader,
+  ErrorState,
+  LoadingState,
+  EmptyState,
+  type DataTableColumn,
+  type DataTableSort,
+} from "@metacentrum/design-system";
 
 type SortColumn = "name" | "priority" | "totalJobs" | "fairshare" | "reservationName" | "reservationOwner" | "reservationStart" | "reservationEnd";
 
@@ -197,15 +206,11 @@ export function JobsQueuesPage() {
     }
   };
 
-  const handleResSort = (column: SortColumn) => {
-    if (resSort === column) {
-      // Toggle order if same column
-      setResOrder(resOrder === "asc" ? "desc" : "asc");
-    } else {
-      // Set new column with default order
-      setResSort(column);
-      setResOrder("desc");
-    }
+  // DataTable toggles the same column and starts a new one at desc
+  // (firstSortDirection), as the old header did.
+  const handleResSortChange = (next: DataTableSort) => {
+    setResSort(next.key as SortColumn);
+    setResOrder(next.direction);
   };
 
   // Compact view covers narrow-width phones (portrait) as well as short-height
@@ -213,6 +218,129 @@ export function JobsQueuesPage() {
   // the full desktop column set on a screen too short to comfortably use it.
   const isCompact = useMediaQuery(
     "(max-width: 639px), (max-height: 500px) and (orientation: landscape)"
+  );
+
+  const queueIdOf = (queue: QueueListDTO) =>
+    queue.server ? `${queue.name}@${queue.server}.metacentrum.cz` : queue.name;
+
+  const allReservationColumns: (DataTableColumn<QueueListDTO> | false)[] = [
+    {
+      key: "name",
+      header: t("queues.queueName"),
+      sortable: true,
+      firstSortDirection: "desc",
+      render: (queue) => (
+        <div className="text-sm min-w-0">
+          <Link
+            to={`/queues/${queueIdOf(queue)}`}
+            className="font-medium text-gray-900 hover:text-primary-600 break-all"
+          >
+            {queueIdOf(queue)}
+          </Link>
+          {queue.totalJobs !== undefined && queue.totalJobs !== null && (
+            <div className="text-xs text-gray-400 mt-0.5">
+              {t("queues.total")} {String(queue.totalJobs)}
+            </div>
+          )}
+        </div>
+      ),
+    },
+    {
+      key: "reservationName",
+      header: t("queues.reservationName"),
+      sortable: true,
+      firstSortDirection: "desc",
+      render: ({ reservation: resv }) => (
+        <div className="text-sm text-gray-600 min-w-0">
+          {resv ? (
+            <div className="font-medium break-words">
+              {resv.displayName && typeof resv.displayName === "string" ? resv.displayName : "-"}
+            </div>
+          ) : "-"}
+        </div>
+      ),
+    },
+    !isCompact && {
+      key: "reservationOwner",
+      header: t("queues.reservationOwner"),
+      sortable: true,
+      firstSortDirection: "desc",
+      render: ({ reservation: resv }) => (
+        <span className="text-sm text-gray-600">
+          {resv?.owner && typeof resv.owner === "string" ? (
+            <Link
+              to={`/users/${encodeURIComponent((resv.owner as string).split("@")[0])}`}
+              className="text-primary-600 hover:text-primary-800"
+            >
+              {(resv.owner as string).split("@")[0]}
+            </Link>
+          ) : "-"}
+        </span>
+      ),
+    },
+    !isCompact && {
+      key: "status",
+      header: t("queues.status"),
+      render: ({ reservation: resv }) =>
+        resv?.isStarted ? (
+          <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800 whitespace-nowrap">
+            {t("machines.reservationStarted")}
+          </span>
+        ) : (
+          <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-orange-100 text-orange-800 whitespace-nowrap">
+            {t("machines.reservationNotStarted")}
+          </span>
+        ),
+    },
+    !isCompact && {
+      key: "reservationStart",
+      header: t("queues.reservationStart"),
+      sortable: true,
+      firstSortDirection: "desc",
+      render: ({ reservation: resv }) => (
+        <span className="text-sm text-gray-600">
+          {resv?.startTime && typeof resv.startTime === "number"
+            ? formatResvDate(resv.startTime)
+            : "-"}
+        </span>
+      ),
+    },
+    !isCompact && {
+      key: "reservationEnd",
+      header: t("queues.reservationEnd"),
+      sortable: true,
+      firstSortDirection: "desc",
+      render: ({ reservation: resv }) => (
+        <span className="text-sm text-gray-600">
+          {resv?.endTime && typeof resv.endTime === "number"
+            ? formatResvDate(resv.endTime)
+            : "-"}
+        </span>
+      ),
+    },
+    !isCompact && {
+      key: "reservationResources",
+      header: t("queues.reservationResources"),
+      render: ({ reservation: resv }) => (
+        <div className="text-xs text-gray-600 space-y-0.5 whitespace-nowrap">
+          {resv?.resourceNcpus != null && (
+            <div>{t("queues.cpus")}: {String(resv.resourceNcpus)}</div>
+          )}
+          {resv?.resourceNgpus != null && (
+            <div>{t("queues.gpus")}: {String(resv.resourceNgpus)}</div>
+          )}
+          {resv?.resourceNodect != null && (
+            <div>{t("queues.nodes")}: {String(resv.resourceNodect)}</div>
+          )}
+          {resv?.resourceMem != null && (
+            <div>{t("queues.memory")}: {String(resv.resourceMem)}</div>
+          )}
+        </div>
+      ),
+    },
+  ];
+  const reservationColumns = allReservationColumns.filter(
+    (c): c is DataTableColumn<QueueListDTO> => Boolean(c)
   );
 
   return (
@@ -319,167 +447,13 @@ export function JobsQueuesPage() {
             <Icon icon="mdi:calendar-clock" className="w-5 h-5 text-purple-600" />
             <h2 className="text-sm font-semibold text-gray-700">{t("queues.reservationsTitle")}</h2>
           </div>
-          {/* Column headers */}
-          <div className="px-4 py-3 border-b border-gray-200 bg-gray-50">
-            <div className={`grid ${isCompact ? "grid-cols-2" : "grid-cols-12"} gap-2 text-xs font-medium text-gray-500 tracking-wide`}>
-              <div className={`col-span-1 ${isCompact ? "" : "col-span-3"}`}>
-                <QueuesSortableHeader
-                  column="name"
-                  currentSortColumn={resSort}
-                  sortDirection={resOrder}
-                  onSort={handleResSort}
-                >
-                  {t("queues.queueName")}
-                </QueuesSortableHeader>
-              </div>
-              <div className={`col-span-1 ${isCompact ? "" : "col-span-2"}`}>
-                <QueuesSortableHeader
-                  column="reservationName"
-                  currentSortColumn={resSort}
-                  sortDirection={resOrder}
-                  onSort={handleResSort}
-                >
-                  {t("queues.reservationName")}
-                </QueuesSortableHeader>
-              </div>
-              {!isCompact && (
-                <div className="col-span-1">
-                  <QueuesSortableHeader
-                    column="reservationOwner"
-                    currentSortColumn={resSort}
-                    sortDirection={resOrder}
-                    onSort={handleResSort}
-                  >
-                    {t("queues.reservationOwner")}
-                  </QueuesSortableHeader>
-                </div>
-              )}
-              {!isCompact && (
-                <div className="col-span-1">{t("queues.status")}</div>
-              )}
-              {!isCompact && (
-                <div className="col-span-2">
-                  <QueuesSortableHeader
-                    column="reservationStart"
-                    currentSortColumn={resSort}
-                    sortDirection={resOrder}
-                    onSort={handleResSort}
-                  >
-                    {t("queues.reservationStart")}
-                  </QueuesSortableHeader>
-                </div>
-              )}
-              {!isCompact && (
-                <div className="col-span-2">
-                  <QueuesSortableHeader
-                    column="reservationEnd"
-                    currentSortColumn={resSort}
-                    sortDirection={resOrder}
-                    onSort={handleResSort}
-                  >
-                    {t("queues.reservationEnd")}
-                  </QueuesSortableHeader>
-                </div>
-              )}
-              {!isCompact && (
-                <div className="col-span-1">{t("queues.reservationResources")}</div>
-              )}
-            </div>
-          </div>
-          {/* Rows */}
-          <div>
-            {filteredReservationQueues.map((queue) => {
-              const resv = queue.reservation;
-              const queueId = queue.server
-                ? `${queue.name}@${queue.server}.metacentrum.cz`
-                : queue.name;
-              return (
-                <div
-                  key={queue.name}
-                  className={`grid ${isCompact ? "grid-cols-2" : "grid-cols-12"} gap-2 items-start py-3 px-4 border-b border-gray-100 hover:bg-gray-50`}
-                >
-                  {/* Queue Name */}
-                  <div className={`col-span-1 ${isCompact ? "" : "col-span-3"} text-sm min-w-0`}>
-                    <Link
-                      to={`/queues/${queueId}`}
-                      className="font-medium text-gray-900 hover:text-primary-600 break-all"
-                    >
-                      {queueId}
-                    </Link>
-                    {queue.totalJobs !== undefined && queue.totalJobs !== null && (
-                      <div className="text-xs text-gray-400 mt-0.5">
-                        {t("queues.total")} {String(queue.totalJobs)}
-                      </div>
-                    )}
-                  </div>
-                  {/* Reservation Name / Display Name */}
-                  <div className={`col-span-1 ${isCompact ? "" : "col-span-2"} text-sm text-gray-600 min-w-0`}>
-                    {resv ? (
-                      <>
-                        <div className="font-medium break-words">
-                          {resv.displayName && typeof resv.displayName === "string" ? resv.displayName : "-"}
-                        </div>
-                      </>
-                    ) : "-"}
-                  </div>
-                  {!isCompact && (
-                    <>
-                      {/* Owner */}
-                      <div className="col-span-1 text-sm text-gray-600">
-                        {resv?.owner && typeof resv.owner === "string" ? (
-                          <Link
-                            to={`/users/${encodeURIComponent((resv.owner as string).split("@")[0])}`}
-                            className="text-primary-600 hover:text-primary-800"
-                          >
-                            {(resv.owner as string).split("@")[0]}
-                          </Link>
-                        ) : "-"}
-                      </div>
-                      {/* State */}
-                      <div className="col-span-1 text-sm">
-                        {resv?.isStarted ? (
-                          <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800">
-                            {t("machines.reservationStarted")}
-                          </span>
-                        ) : (
-                          <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-orange-100 text-orange-800">
-                            {t("machines.reservationNotStarted")}
-                          </span>
-                        )}
-                      </div>
-                      {/* Start Time */}
-                      <div className="col-span-2 text-sm text-gray-600">
-                        {resv?.startTime && typeof resv.startTime === "number"
-                          ? formatResvDate(resv.startTime)
-                          : "-"}
-                      </div>
-                      {/* End Time */}
-                      <div className="col-span-2 text-sm text-gray-600">
-                        {resv?.endTime && typeof resv.endTime === "number"
-                          ? formatResvDate(resv.endTime)
-                          : "-"}
-                      </div>
-                      {/* Resources */}
-                      <div className="col-span-1 text-xs text-gray-600 space-y-0.5">
-                        {resv?.resourceNcpus != null && (
-                          <div>{t("queues.cpus")}: {String(resv.resourceNcpus)}</div>
-                        )}
-                        {resv?.resourceNgpus != null && (
-                          <div>{t("queues.gpus")}: {String(resv.resourceNgpus)}</div>
-                        )}
-                        {resv?.resourceNodect != null && (
-                          <div>{t("queues.nodes")}: {String(resv.resourceNodect)}</div>
-                        )}
-                        {resv?.resourceMem != null && (
-                          <div>{t("queues.memory")}: {String(resv.resourceMem)}</div>
-                        )}
-                      </div>
-                    </>
-                  )}
-                </div>
-              );
-            })}
-          </div>
+          <DataTable
+            columns={reservationColumns}
+            rows={filteredReservationQueues}
+            rowKey={(queue) => queue.name}
+            sort={{ key: resSort, direction: resOrder }}
+            onSortChange={handleResSortChange}
+          />
         </div>
       )}
     </PageContainer>

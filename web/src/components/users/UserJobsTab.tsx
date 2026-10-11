@@ -1,10 +1,6 @@
-import { useTranslation } from "react-i18next";
 import { JobsTable } from "@/components/jobs/JobsTable";
-import { Pagination } from "@/components/common/Pagination";
-import { JobsSearchBar } from "@/components/jobs/JobsSearchBar";
 import type { JobsListDTO, JobsListMetaDto } from "@/lib/generated-api";
 import type { JobFilterableState } from "@/components/jobs/JobsFilterableHeader";
-import { ErrorState, LoadingState } from "@metacentrum/design-system";
 
 type SortColumn =
   | "id"
@@ -54,57 +50,23 @@ export function UserJobsTab({
   onSearchChange,
   onStateFilterChange,
 }: UserJobsTabProps) {
-  const { t } = useTranslation();
-
-  const jobsTotalPages = jobsData?.meta?.totalCount
-    ? Math.ceil(jobsData.meta.totalCount / jobsLimit)
-    : 0;
-
   return (
-    <div>
-      <JobsSearchBar
-        searchQuery={jobsSearch}
-        onSearchChange={onSearchChange}
-        totalJobs={jobsData?.meta?.totalCount || 0}
-        lastRunningCompletedBy={jobsData?.meta?.lastRunningCompletedBy || null}
-      />
-
-      {isLoading && (
-        <LoadingState label={t("common.loading")} />
-      )}
-
-      {error && (
-        <ErrorState
-          className="mb-4"
-          title={t("common.errorLoading")}
-          description={
-            error instanceof Error
-              ? error.message
-              : t("common.unknownError")
-          }
-        />
-      )}
-
-      {jobsData && jobsData.data && (
-        <>
-          <JobsTable
-            jobs={jobsData.data.jobs}
-            sortColumn={jobsSort}
-            sortDirection={jobsOrder}
-            onSort={onSort}
-            filterableStates={jobsData.meta?.filterableStates || null}
-            stateFilter={stateFilter}
-            onStateFilterChange={onStateFilterChange}
-          />
-          <Pagination
-            currentPage={jobsPage}
-            totalPages={jobsTotalPages}
-            onPageChange={onPageChange}
-            pageSize={jobsLimit}
-            onPageSizeChange={onPageSizeChange}
-          />
-        </>
-      )}
-    </div>
+    <JobsTable
+      jobs={jobsData?.data?.jobs ?? []}
+      meta={jobsData?.meta}
+      isLoading={isLoading}
+      error={error}
+      sortColumn={jobsSort}
+      sortDirection={jobsOrder}
+      onSort={onSort}
+      search={jobsSearch}
+      onSearchChange={onSearchChange}
+      stateFilter={stateFilter}
+      onStateFilterChange={onStateFilterChange}
+      page={jobsPage}
+      pageSize={jobsLimit}
+      onPageChange={onPageChange}
+      onPageSizeChange={onPageSizeChange}
+    />
   );
 }

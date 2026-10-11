@@ -7,9 +7,8 @@ import { useJobs } from "@/hooks/useJobs";
 import { useProjects } from "@/hooks/useProjects";
 import { JobsTable } from "@/components/jobs/JobsTable";
 import { ProjectsTable } from "@/components/projects/ProjectsTable";
-import { Pagination } from "@/components/common/Pagination";
+import { usePaginationLabels } from "@/lib/paginationLabels";
 import { useJobsPageSize } from "@/hooks/useJobsPageSize";
-import { JobsSearchBar } from "@/components/jobs/JobsSearchBar";
 import { ProjectsSearchBar } from "@/components/projects/ProjectsSearchBar";
 import type {
   SortColumn as ProjectsSortColumn,
@@ -32,6 +31,7 @@ type JobsSortColumnType =
 
 export function PersonalViewPage() {
   const { t } = useTranslation();
+  const paginationLabels = usePaginationLabels();
   const navigate = useNavigate();
   const { data: currentUser } = useCurrentUser();
   const username = currentUser?.username?.split("@")[0] || "";
@@ -248,13 +248,6 @@ export function PersonalViewPage() {
     navigate(`/users/${username}`);
   };
 
-  const userJobsTotalCount =
-    userJobsData && typeof userJobsData === "object" && "meta" in userJobsData
-      ? (userJobsData.meta as { totalCount?: number })?.totalCount || 0
-      : 0;
-  const userJobsTotalPages = userJobsTotalCount
-    ? Math.ceil(userJobsTotalCount / jobsLimit)
-    : 0;
   const userJobs =
     userJobsData && typeof userJobsData === "object" && "data" in userJobsData
       ? (userJobsData.data as { jobs?: any[] })?.jobs || []
@@ -334,9 +327,6 @@ export function PersonalViewPage() {
 
   // Update total count to reflect filtered results
   const finalProjectsTotalCount = filteredProjects.length;
-  const finalProjectsTotalPages = finalProjectsTotalCount
-    ? Math.ceil(finalProjectsTotalCount / projectsLimit)
-    : 0;
 
   return (
     <PageContainer>
@@ -541,47 +531,24 @@ export function PersonalViewPage() {
           <h2 className="text-xl font-semibold text-gray-900 mb-4">
             {t("personalView.myPbsJobs")}
           </h2>
-          <JobsSearchBar
-            searchQuery={jobsSearch}
+          <JobsTable
+            jobs={userJobs}
+            meta={userJobsData?.meta}
+            isLoading={userJobsLoading}
+            error={userJobsError}
+            hideUserColumn
+            sortColumn={jobsSort}
+            sortDirection={jobsOrder}
+            onSort={handleJobsSort}
+            search={jobsSearch}
             onSearchChange={handleJobsSearchChange}
-            totalJobs={userJobsTotalCount}
-            lastRunningCompletedBy={userJobsData?.meta?.lastRunningCompletedBy || null}
+            stateFilter={stateFilter}
+            onStateFilterChange={handleStateFilterChange}
+            page={jobsPage}
+            pageSize={jobsLimit}
+            onPageChange={handleJobsPageChange}
+            onPageSizeChange={handleJobsPageSizeChange}
           />
-          {userJobsLoading && (
-            <LoadingState label={t("common.loading")} />
-          )}
-          {userJobsError && (
-            <ErrorState
-              className="mb-4"
-              title={t("common.errorLoading")}
-              description={
-                userJobsError instanceof Error
-                  ? userJobsError.message
-                  : t("common.unknownError")
-              }
-            />
-          )}
-          {userJobsData && (
-            <>
-              <JobsTable
-                jobs={userJobs}
-                sortColumn={jobsSort}
-                sortDirection={jobsOrder}
-                onSort={handleJobsSort}
-                hideUserColumn={true}
-                filterableStates={userJobsData.meta?.filterableStates || null}
-                stateFilter={stateFilter}
-                onStateFilterChange={handleStateFilterChange}
-              />
-              <Pagination
-                currentPage={jobsPage}
-                totalPages={userJobsTotalPages}
-                onPageChange={handleJobsPageChange}
-                pageSize={jobsLimit}
-                onPageSizeChange={handleJobsPageSizeChange}
-              />
-            </>
-          )}
         </div>
 
         {/* My Cloud Projects Section */}
@@ -615,11 +582,14 @@ export function PersonalViewPage() {
                 sortColumn={projectsSort}
                 sortDirection={projectsOrder}
                 onSort={handleProjectsSort}
-              />
-              <Pagination
-                currentPage={projectsPage}
-                totalPages={finalProjectsTotalPages}
-                onPageChange={handleProjectsPageChange}
+                pagination={{
+                  page: projectsPage,
+                  pageSize: projectsLimit,
+                  pageSizes: [projectsLimit],
+                  totalItems: finalProjectsTotalCount,
+                  onChange: ({ page }) => handleProjectsPageChange(page),
+                  labels: paginationLabels,
+                }}
               />
             </>
           )}

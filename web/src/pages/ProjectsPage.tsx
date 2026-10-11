@@ -1,20 +1,35 @@
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useProjects } from "@/hooks/useProjects";
-import { Pagination } from "@/components/common/Pagination";
-import { ProjectsSearchBar } from "@/components/projects/ProjectsSearchBar";
-import { ProjectsTable } from "@/components/projects/ProjectsTable";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
+import { useProjectsTableColumns } from "@/components/projects/projectsTableColumns";
 import type { SortColumn, Project } from "@/components/projects/types";
-import { PageContainer, PageHeader, ErrorState, LoadingState } from "@metacentrum/design-system";
+import { usePaginationLabels } from "@/lib/paginationLabels";
+import {
+  DataTable,
+  PageContainer,
+  PageHeader,
+  type DataTableSort,
+} from "@metacentrum/design-system";
+
+// The projects list always used a fixed page size of 20.
+const PROJECTS_PAGE_SIZES = [20];
 
 export function ProjectsPage() {
   const { t } = useTranslation();
+  const paginationLabels = usePaginationLabels();
   const [page, setPage] = useState(1);
-  const [limit] = useState(20);
+  const [limit, setLimit] = useState(20);
   const [sort, setSort] = useState<SortColumn>("status");
   const [order, setOrder] = useState<"asc" | "desc">("asc");
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
+
+  // Compact view covers narrow-width phones (portrait) as well as short-height
+  // phones in landscape.
+  const isCompact = useMediaQuery(
+    "(max-width: 639px), (max-height: 500px) and (orientation: landscape)"
+  );
 
   // Debounce search input - update debouncedSearch after 300ms of no typing
   useEffect(() => {
@@ -34,81 +49,69 @@ export function ProjectsPage() {
     search: debouncedSearch.trim() || undefined,
   });
 
-  const handleSort = (column: SortColumn) => {
-    if (sort === column) {
-      // Toggle order if same column
-      setOrder(order === "asc" ? "desc" : "asc");
-    } else {
-      // Set new column with default order
-      // Default to desc for numeric fields, asc for text fields
-      const defaultOrder =
-        column === "vmCount" || column === "vcpus" || column === "memoryGb"
-          ? "desc"
-          : "asc";
-      setSort(column);
-      setOrder(defaultOrder);
-    }
+  // DataTable picks the direction: toggles on the same column, desc first for
+  // the numeric (reserved resources) column, asc otherwise.
+  const handleSortChange = (next: DataTableSort) => {
+    setSort(next.key as SortColumn);
+    setOrder(next.direction);
     setPage(1);
   };
 
-  const handlePageChange = (newPage: number) => {
-    setPage(newPage);
+  const handlePaginationChange = (next: { page: number; pageSize: number }) => {
+    setPage(next.page);
+    setLimit(next.pageSize);
     window.scrollTo({ top: 0, behavior: "smooth" });
-  };
-
-  const handleSearchChange = (query: string) => {
-    setSearch(query);
-    // Don't reset page here - let the debounce effect handle it
   };
 
   const totalCount =
     data && typeof data === "object" && "meta" in data
       ? (data.meta as { totalCount?: number })?.totalCount || 0
       : 0;
-  const totalPages = totalCount ? Math.ceil(totalCount / limit) : 0;
 
   const projects: Project[] = data?.data?.projects || [];
+  const columns = useProjectsTableColumns(isCompact);
 
   return (
     <PageContainer>
       <PageHeader title={t("pages.projects")} />
-      <ProjectsSearchBar
-        searchQuery={search}
-        onSearchChange={handleSearchChange}
-        totalProjects={totalCount}
+      <DataTable
+        columns={columns}
+        rows={projects}
+        rowKey={(project) => project.id}
+        sort={{ key: sort, direction: order }}
+        onSortChange={handleSortChange}
+        search={{
+          value: search,
+          // Page resets in the debounce effect above.
+          onChange: setSearch,
+          placeholder: t("projects.searchPlaceholder"),
+        }}
+        toolbar={
+          <span className="self-center px-4 text-sm text-gray-600 whitespace-nowrap">
+            {t("projects.totalProjects", { count: totalCount })}
+          </span>
+        }
+        loading={isLoading}
+        loadingLabel={t("common.loading")}
+        error={
+          error
+            ? {
+                title: t("common.errorLoading"),
+                description:
+                  error instanceof Error ? error.message : t("common.unknownError"),
+              }
+            : undefined
+        }
+        emptyTitle={t("projects.noProjects")}
+        pagination={{
+          page,
+          pageSize: limit,
+          totalItems: totalCount,
+          onChange: handlePaginationChange,
+          pageSizes: PROJECTS_PAGE_SIZES,
+          labels: paginationLabels,
+        }}
       />
-
-      {isLoading && (
-        <LoadingState label={t("common.loading")} />
-      )}
-
-      {error && (
-        <ErrorState
-          title={t("common.errorLoading")}
-          description={
-            error instanceof Error
-              ? error.message
-              : t("common.unknownError")
-          }
-        />
-      )}
-
-      {data && (
-        <>
-          <ProjectsTable
-            projects={projects}
-            sortColumn={sort}
-            sortDirection={order}
-            onSort={handleSort}
-          />
-
-          <Pagination
-            currentPage={page}
-            totalPages={totalPages}
-            onPageChange={handlePageChange}
-          />
-        </>
-      )}
     </PageContainer>
   );
 }

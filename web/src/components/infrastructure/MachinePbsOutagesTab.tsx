@@ -1,7 +1,13 @@
 import { useTranslation } from "react-i18next";
 import { useNodeOutages } from "@/hooks/useNodeOutages";
 import type { OutageRecordDTO } from "@/lib/generated-api";
-import { LoadingState, ErrorState, EmptyState } from "@metacentrum/design-system";
+import {
+  DataTable,
+  LoadingState,
+  ErrorState,
+  EmptyState,
+  type DataTableColumn,
+} from "@metacentrum/design-system";
 
 interface MachinePbsOutagesTabProps {
   nodeName: string | null;
@@ -93,46 +99,51 @@ export function MachinePbsOutagesTab({ nodeName }: MachinePbsOutagesTabProps) {
     return <EmptyState title={t("machines.noOutages")} />;
   }
 
+  // Outage records have no id; key by position in the (unsorted) API list.
+  const columns: DataTableColumn<OutageRecordDTO>[] = [
+    {
+      key: "type",
+      header: "Type",
+      render: (outage) => (
+        <span className="whitespace-nowrap text-sm text-gray-900">
+          {outage.type || "-"}
+        </span>
+      ),
+    },
+    {
+      key: "startTime",
+      header: "Start Time",
+      render: (outage) => (
+        <span className="whitespace-nowrap text-sm text-gray-900 font-mono">
+          {formatDateTime(outage.startTime)}
+        </span>
+      ),
+    },
+    {
+      key: "endTime",
+      header: "End Time",
+      render: (outage) => (
+        <span className="whitespace-nowrap text-sm text-gray-900 font-mono">
+          {formatDateTime(outage.endTime)}
+        </span>
+      ),
+    },
+    {
+      key: "comment",
+      header: "Comment",
+      render: (outage) => (
+        <span className="text-sm text-gray-900">{formatComment(outage.comment)}</span>
+      ),
+    },
+  ];
+
   return (
     <div className="px-6 py-4">
-      <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-3 sm:px-4 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Type
-              </th>
-              <th className="px-3 sm:px-4 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Start Time
-              </th>
-              <th className="px-3 sm:px-4 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                End Time
-              </th>
-              <th className="px-3 sm:px-4 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Comment
-              </th>
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {outages.map((outage: OutageRecordDTO, index: number) => (
-              <tr key={index} className="hover:bg-gray-50">
-                <td className="px-3 sm:px-4 py-2 sm:py-3 whitespace-nowrap text-sm text-gray-900">
-                  {outage.type || "-"}
-                </td>
-                <td className="px-3 sm:px-4 py-2 sm:py-3 whitespace-nowrap text-sm text-gray-900 font-mono">
-                  {formatDateTime(outage.startTime)}
-                </td>
-                <td className="px-3 sm:px-4 py-2 sm:py-3 whitespace-nowrap text-sm text-gray-900 font-mono">
-                  {formatDateTime(outage.endTime)}
-                </td>
-                <td className="px-3 sm:px-4 py-2 sm:py-3 text-sm text-gray-900">
-                  {formatComment(outage.comment)}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      <DataTable
+        columns={columns}
+        rows={outages}
+        rowKey={(outage) => outages.indexOf(outage)}
+      />
     </div>
   );
 }

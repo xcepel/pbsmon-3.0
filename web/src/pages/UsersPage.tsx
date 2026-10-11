@@ -3,18 +3,26 @@ import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { useUsers } from "@/hooks/useUsers";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { useImpersonation } from "@/contexts/ImpersonationContext";
-import { UsersSearchBar } from "@/components/users/UsersSearchBar";
-import { UsersTable } from "@/components/users/UsersTable";
-import { Pagination } from "@/components/common/Pagination";
-import type { SortColumn } from "@/components/users/types";
-import { PageContainer, PageHeader, ErrorState, LoadingState } from "@metacentrum/design-system";
+import { useUsersTableColumns } from "@/components/users/usersTableColumns";
+import { usePaginationLabels } from "@/lib/paginationLabels";
+import {
+  DataTable,
+  PageContainer,
+  PageHeader,
+  type DataTableSort,
+} from "@metacentrum/design-system";
+
+// The users list always used a fixed page size of 20.
+const USERS_PAGE_SIZES = [20];
 
 export function UsersPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const paginationLabels = usePaginationLabels();
   const [page, setPage] = useState(1);
-  const [limit] = useState(20);
+  const [limit, setLimit] = useState(20);
   const [sort, setSort] = useState<string>("fairshare-pbs-m1");
   const [order, setOrder] = useState<"asc" | "desc">("asc");
   const [search, setSearch] = useState("");
@@ -22,6 +30,12 @@ export function UsersPage() {
   const { data: currentUser } = useCurrentUser();
   const { impersonate } = useImpersonation();
   const isAdmin = currentUser?.role === "admin";
+
+  // Compact view covers narrow-width phones (portrait) as well as short-height
+  // phones in landscape.
+  const isCompact = useMediaQuery(
+    "(max-width: 639px), (max-height: 500px) and (orientation: landscape)"
+  );
 
   const { data, isLoading, error } = useUsers({
     page,
@@ -31,23 +45,20 @@ export function UsersPage() {
     search: search.trim() || undefined,
   });
 
-  const handleSort = (column: SortColumn) => {
-    if (sort === column) {
-      // Toggle order if same column
-      setOrder(order === "asc" ? "desc" : "asc");
+  const handleSortChange = (next: DataTableSort) => {
+    if (next.key === sort) {
+      setOrder(next.direction);
     } else {
-      // Set new column with default order
-      // Default to desc for fairshare, asc for others
-      const defaultOrder = column.startsWith("fairshare-") ? "desc" : "asc";
-      setSort(column);
-      setOrder(defaultOrder);
+      // New column: desc for fairshare, asc for others
+      setSort(next.key);
+      setOrder(next.key.startsWith("fairshare-") ? "desc" : "asc");
     }
     setPage(1); // Reset to first page on sort
   };
 
-  const handlePageChange = (newPage: number) => {
-    setPage(newPage);
-    // Scroll to top when page changes
+  const handlePaginationChange = (next: { page: number; pageSize: number }) => {
+    setPage(next.page);
+    setLimit(next.pageSize);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
@@ -62,57 +73,58 @@ export function UsersPage() {
     navigate("/personal-view");
   };
 
-  // Get fairshare servers and maxFairshare from server response
   const fairshareServers = data?.data?.fairshareServers || [];
   const maxFairshare = data?.meta?.maxFairshare || {};
+  const totalCount = data?.meta?.totalCount || 0;
 
-  const totalPages = data?.meta?.totalCount
-    ? Math.ceil(data.meta.totalCount / limit)
-    : 0;
+  const columns = useUsersTableColumns({
+    fairshareServers,
+    maxFairshare,
+    isAdmin,
+    isCompact,
+    onImpersonate: handleImpersonate,
+  });
 
   return (
     <PageContainer>
       <PageHeader title={t("pages.users")} />
-      <UsersSearchBar
-        searchQuery={search}
-        onSearchChange={handleSearchChange}
-        totalUsers={data?.meta?.totalCount || 0}
+      <DataTable
+        columns={columns}
+        rows={data?.data?.users ?? []}
+        rowKey={(user) => user.username}
+        sort={{ key: sort, direction: order }}
+        onSortChange={handleSortChange}
+        search={{
+          value: search,
+          onChange: handleSearchChange,
+          placeholder: t("users.searchPlaceholder"),
+        }}
+        toolbar={
+          <span className="self-center px-4 text-sm text-gray-600 whitespace-nowrap">
+            {t("users.totalUsers", { count: totalCount })}
+          </span>
+        }
+        loading={isLoading}
+        loadingLabel={t("common.loading")}
+        error={
+          error
+            ? {
+                title: t("common.errorLoading"),
+                description:
+                  error instanceof Error ? error.message : t("common.unknownError"),
+              }
+            : undefined
+        }
+        emptyTitle={t("users.noUsersFound")}
+        pagination={{
+          page,
+          pageSize: limit,
+          totalItems: totalCount,
+          onChange: handlePaginationChange,
+          pageSizes: USERS_PAGE_SIZES,
+          labels: paginationLabels,
+        }}
       />
-
-      {isLoading && (
-        <LoadingState label={t("common.loading")} />
-      )}
-
-      {error && (
-        <ErrorState
-          title={t("common.errorLoading")}
-          description={
-            error instanceof Error
-              ? error.message
-              : t("common.unknownError")
-          }
-        />
-      )}
-
-      {data && data.data && (
-        <>
-          <UsersTable
-            users={data.data.users}
-            fairshareServers={fairshareServers}
-            maxFairshare={maxFairshare}
-            sortColumn={sort as SortColumn}
-            sortDirection={order}
-            onSort={handleSort}
-            isAdmin={isAdmin}
-            onImpersonate={handleImpersonate}
-          />
-          <Pagination
-            currentPage={page}
-            totalPages={totalPages}
-            onPageChange={handlePageChange}
-          />
-        </>
-      )}
     </PageContainer>
   );
 }

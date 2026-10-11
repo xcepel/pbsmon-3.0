@@ -2,11 +2,9 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useJobs } from "@/hooks/useJobs";
 import { useJobsSummary } from "@/hooks/useJobsSummary";
-import { JobsSearchBar } from "@/components/jobs/JobsSearchBar";
-import { WaitingJobsTable } from "@/components/jobs/WaitingJobsTable";
+import { WaitingJobsTable } from "@/components/jobs/JobsTable";
 import { WaitingJobsSummary } from "@/components/jobs/WaitingJobsSummary";
-import { Pagination } from "@/components/common/Pagination";
-import { PageContainer, PageHeader, ErrorState, LoadingState } from "@metacentrum/design-system";
+import { PageContainer, PageHeader } from "@metacentrum/design-system";
 
 type SortColumn =
   | "id"
@@ -76,57 +74,33 @@ export function WaitingJobsPage() {
     setSearch(""); // Clear search when filtering by reason
   };
 
-  const totalPages = data?.meta?.totalCount
-    ? Math.ceil(data.meta.totalCount / limit)
-    : 0;
-
   return (
     <PageContainer>
       <PageHeader title={t("pages.waitingJobs")} />
-      {isLoading && (
-        <LoadingState label={t("common.loading")} />
-      )}
-
-      {error && (
-        <ErrorState
-          title={t("common.errorLoading")}
-          description={
-            error instanceof Error
-              ? error.message
-              : t("common.unknownError")
-          }
+      {summaryData && (
+        <WaitingJobsSummary
+          summary={summaryData}
+          onFilterByReason={handleFilterByReason}
+          activeFilter={commentFilter}
         />
       )}
 
-      {data && data.data && (
-        <>
-          {summaryData && (
-            <WaitingJobsSummary
-              summary={summaryData}
-              onFilterByReason={handleFilterByReason}
-              activeFilter={commentFilter}
-            />
-          )}
-
-          <JobsSearchBar
-            searchQuery={search}
-            onSearchChange={handleSearchChange}
-            totalJobs={data?.meta?.totalCount || 0}
-            lastRunningCompletedBy={null}
-          />
-          <WaitingJobsTable
-            jobs={data.data.jobs}
-            sortColumn={sort}
-            sortDirection={order}
-            onSort={handleSort}
-          />
-          <Pagination
-            currentPage={page}
-            totalPages={totalPages}
-            onPageChange={handlePageChange}
-          />
-        </>
-      )}
+      {/* Remount on reason filter change so the search box shows the cleared search */}
+      <WaitingJobsTable
+        key={commentFilter ?? ""}
+        jobs={data?.data?.jobs ?? []}
+        meta={data?.meta}
+        isLoading={isLoading}
+        error={error}
+        sortColumn={sort}
+        sortDirection={order}
+        onSort={handleSort}
+        search={search}
+        onSearchChange={handleSearchChange}
+        page={page}
+        pageSize={limit}
+        onPageChange={handlePageChange}
+      />
     </PageContainer>
   );
 }

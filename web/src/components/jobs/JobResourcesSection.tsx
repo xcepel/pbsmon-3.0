@@ -1,8 +1,10 @@
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { Icon } from "@iconify/react";
-import type { JobDetailDTO } from "@/lib/generated-api";
+import type { AllocatedResourceDTO, JobDetailDTO } from "@/lib/generated-api";
 import { ProgressBar } from "@/components/common/ProgressBar";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
+import { DataTable, type DataTableColumn } from "@metacentrum/design-system";
 
 interface JobResourcesSectionProps {
   job: JobDetailDTO;
@@ -10,6 +12,67 @@ interface JobResourcesSectionProps {
 
 export function JobResourcesSection({ job }: JobResourcesSectionProps) {
   const { t } = useTranslation();
+
+  // GPU/RAM/scratch were hidden below Tailwind's sm breakpoint.
+  const isNarrow = useMediaQuery("(max-width: 639px)");
+
+  const allAllocatedColumns: (DataTableColumn<AllocatedResourceDTO> | false)[] = [
+    {
+      key: "machine",
+      header: t("jobs.machine"),
+      render: (resource) => (
+        <Link
+          to={`/machines/${resource.machine}`}
+          className="whitespace-nowrap text-sm font-medium text-primary-600 hover:text-primary-800"
+        >
+          {resource.machine}
+        </Link>
+      ),
+    },
+    {
+      key: "cpu",
+      header: t("jobs.cpu"),
+      render: (resource) => (
+        <span className="whitespace-nowrap text-sm text-gray-600">{resource.cpu}</span>
+      ),
+    },
+    !isNarrow && {
+      key: "gpu",
+      header: t("jobs.gpu"),
+      render: (resource) => (
+        <span className="whitespace-nowrap text-sm text-gray-600">
+          {resource.gpu === 0 ? (
+            <span className="text-gray-400">{t("jobs.noGpu")}</span>
+          ) : (
+            resource.gpu
+          )}
+        </span>
+      ),
+    },
+    !isNarrow && {
+      key: "ram",
+      header: t("jobs.ram"),
+      render: (resource) => (
+        <span className="whitespace-nowrap text-sm text-gray-600">
+          {resource.ram.toFixed(2)} GB
+        </span>
+      ),
+    },
+    !isNarrow && {
+      key: "scratch",
+      header: t("jobs.scratch"),
+      render: (resource) => (
+        <span className="whitespace-nowrap text-sm text-gray-600">
+          {resource.scratch
+            ? `${resource.scratch.toFixed(2)} GB (${resource.scratchType || "local"})`
+            : "-"}
+        </span>
+      ),
+    },
+  ];
+  const allocatedColumns = allAllocatedColumns.filter(
+    (c): c is DataTableColumn<AllocatedResourceDTO> => Boolean(c)
+  );
 
   // Show usage for running, exiting, and all completed states (C, F, X)
   const completedStates = ["C", "F", "X"];
@@ -273,61 +336,11 @@ export function JobResourcesSection({ job }: JobResourcesSectionProps) {
           <h3 className="text-sm font-medium text-gray-700 mb-3">
             {t("jobs.allocatedResources")}
           </h3>
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    {t("jobs.machine")}
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    {t("jobs.cpu")}
-                  </th>
-                  <th className="hidden sm:table-cell px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    {t("jobs.gpu")}
-                  </th>
-                  <th className="hidden sm:table-cell px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    {t("jobs.ram")}
-                  </th>
-                  <th className="hidden sm:table-cell px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    {t("jobs.scratch")}
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {job.allocatedResources.map((resource, index) => (
-                  <tr key={index} className="hover:bg-gray-50">
-                    <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">
-                      <Link
-                        to={`/machines/${resource.machine}`}
-                        className="text-primary-600 hover:text-primary-800"
-                      >
-                        {resource.machine}
-                      </Link>
-                    </td>
-                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-600">
-                      {resource.cpu}
-                    </td>
-                    <td className="hidden sm:table-cell px-4 py-3 whitespace-nowrap text-sm text-gray-600">
-                      {resource.gpu === 0 ? (
-                        <span className="text-gray-400">{t("jobs.noGpu")}</span>
-                      ) : (
-                        resource.gpu
-                      )}
-                    </td>
-                    <td className="hidden sm:table-cell px-4 py-3 whitespace-nowrap text-sm text-gray-600">
-                      {resource.ram.toFixed(2)} GB
-                    </td>
-                    <td className="hidden sm:table-cell px-4 py-3 whitespace-nowrap text-sm text-gray-600">
-                      {resource.scratch
-                        ? `${resource.scratch.toFixed(2)} GB (${resource.scratchType || "local"})`
-                        : "-"}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <DataTable
+            columns={allocatedColumns}
+            rows={job.allocatedResources}
+            rowKey={(resource) => job.allocatedResources.indexOf(resource)}
+          />
         </div>
       )}
     </div>

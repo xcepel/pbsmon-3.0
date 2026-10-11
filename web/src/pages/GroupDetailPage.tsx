@@ -1,8 +1,17 @@
 import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router-dom";
 import { useParams } from "react-router-dom";
 import { useGroupDetail } from "@/hooks/useGroups";
-import { PageContainer, PageHeader, EmptyState, ErrorState, LoadingState } from "@metacentrum/design-system";
+import { useRowNavigate } from "@/lib/rowNavigation";
+import type { GroupMemberDTO } from "@/lib/generated-api";
+import {
+  DataTable,
+  PageContainer,
+  PageHeader,
+  EmptyState,
+  ErrorState,
+  LoadingState,
+  type DataTableColumn,
+} from "@metacentrum/design-system";
 
 export function GroupDetailPage() {
   const { t } = useTranslation();
@@ -14,11 +23,32 @@ export function GroupDetailPage() {
     error,
   } = useGroupDetail(decodedGroupName);
   const data = groupDetail?.data;
-  const navigate = useNavigate();
+  const rowNavigate = useRowNavigate();
 
-  const handleUserClick = (user: string) => {
-    navigate(`/users/${encodeURIComponent(user)}`);
-  };
+  const memberColumns: DataTableColumn<GroupMemberDTO>[] = [
+    {
+      key: "nickname",
+      header: t("groups.nickname"),
+      render: (member) => (
+        <span className="text-sm font-medium text-gray-900 break-words">
+          {member.nickname}
+        </span>
+      ),
+    },
+    {
+      key: "name",
+      header: t("groups.name"),
+      render: (member) => (
+        <span className="text-sm text-gray-500 break-words">
+          {member.name
+            ? typeof member.name === "string"
+              ? member.name
+              : member.name.name
+            : "-"}
+        </span>
+      ),
+    },
+  ];
 
   if (isLoading) {
     return (
@@ -81,40 +111,15 @@ export function GroupDetailPage() {
           <h2 className="text-lg font-semibold text-gray-900 mb-4">
             {t("groups.members")} ({data.members.length})
           </h2>
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-3 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    {t("groups.nickname")}
-                  </th>
-                  <th className="px-3 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    {t("groups.name")}
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {data.members.map((member) => (
-                  <tr
-                    key={member.nickname}
-                    onClick={() => handleUserClick(member.nickname)}
-                    className="hover:bg-gray-50 cursor-pointer"
-                  >
-                    <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-normal sm:whitespace-nowrap text-sm font-medium text-gray-900 break-words">
-                      {member.nickname}
-                    </td>
-                    <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-normal sm:whitespace-nowrap text-sm text-gray-500 break-words">
-                      {member.name
-                        ? typeof member.name === "string"
-                          ? member.name
-                          : member.name.name
-                        : "-"}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <DataTable
+            columns={memberColumns}
+            rows={data.members}
+            rowKey={(member) => member.nickname}
+            emptyTitle={t("table.noRecords")}
+            onRowClick={(member, event) =>
+              rowNavigate(`/users/${encodeURIComponent(member.nickname)}`, event)
+            }
+          />
         </div>
       </div>
     </PageContainer>

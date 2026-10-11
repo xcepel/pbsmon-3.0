@@ -4,16 +4,13 @@ import { useSearchParams } from "react-router-dom";
 import { useJobs } from "@/hooks/useJobs";
 import { useJobsSummary } from "@/hooks/useJobsSummary";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
-import { JobsSearchBar } from "@/components/jobs/JobsSearchBar";
-import { JobsTable } from "@/components/jobs/JobsTable";
-import { WaitingJobsTable } from "@/components/jobs/WaitingJobsTable";
+import { JobsTable, WaitingJobsTable } from "@/components/jobs/JobsTable";
 import { WaitingJobsSummary } from "@/components/jobs/WaitingJobsSummary";
-import { Pagination } from "@/components/common/Pagination";
 import { Tabs } from "@/components/common/Tabs";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { useJobsPageSize } from "@/hooks/useJobsPageSize";
 import type { JobFilterableState } from "@/components/jobs/JobsFilterableHeader";
-import { PageContainer, PageHeader, ErrorState, LoadingState } from "@metacentrum/design-system";
+import { PageContainer, PageHeader } from "@metacentrum/design-system";
 
 type SortColumn =
   | "id"
@@ -167,7 +164,7 @@ export function JobsPage() {
 
   const handleAllStateFilterChange = (state: JobFilterableState) => {
     setAllStateFilter(state);
-    setMyJobsPage(1);
+    setAllJobsPage(1);
   };
 
   const handleAllJobsPageChange = (newPage: number) => {
@@ -247,118 +244,52 @@ export function JobsPage() {
     setMyJobsPage(1);
   };
 
-  const allJobsTotalPages = allJobsData?.meta?.totalCount
-    ? Math.ceil(allJobsData.meta.totalCount / jobsPageSize)
-    : 0;
-
-  const waitingJobsTotalPages = waitingJobsData?.meta?.totalCount
-    ? Math.ceil(waitingJobsData.meta.totalCount / jobsPageSize)
-    : 0;
-
-  const myJobsTotalPages = myJobsData?.meta?.totalCount
-    ? Math.ceil(myJobsData.meta.totalCount / jobsPageSize)
-    : 0;
-
   const tabs = [
     {
       id: "my",
       label: t("jobs.tabs.myJobs"),
       content: (
-        <div>
-          <JobsSearchBar
-            searchQuery={myJobsSearch}
-            onSearchChange={handleMyJobsSearchChange}
-            totalJobs={myJobsData?.meta?.totalCount || 0}
-            lastRunningCompletedBy={myJobsData?.meta?.lastRunningCompletedBy || null}
-          />
-
-          {myJobsLoading && (
-            <LoadingState label={t("common.loading")} />
-          )}
-
-          {myJobsError && (
-            <ErrorState
-              title={t("common.errorLoading")}
-              description={
-                myJobsError instanceof Error
-                  ? myJobsError.message
-                  : t("common.unknownError")
-              }
-            />
-          )}
-
-          {myJobsData && myJobsData.data && (
-            <>
-              <JobsTable
-                jobs={myJobsData.data.jobs}
-                sortColumn={myJobsSort}
-                sortDirection={myJobsOrder}
-                onSort={handleMyJobsSort}
-                hideUserColumn={true}
-                filterableStates={myJobsData.meta?.filterableStates || null}
-                stateFilter={myStateFilter}
-                onStateFilterChange={handleMyStateFilterChange}
-              />
-              <Pagination
-                currentPage={myJobsPage}
-                totalPages={myJobsTotalPages}
-                onPageChange={handleMyJobsPageChange}
-                pageSize={jobsPageSize}
-                onPageSizeChange={handleJobsPageSizeChange}
-              />
-            </>
-          )}
-        </div>
+        <JobsTable
+          jobs={myJobsData?.data?.jobs ?? []}
+          meta={myJobsData?.meta}
+          isLoading={myJobsLoading}
+          error={myJobsError}
+          hideUserColumn
+          sortColumn={myJobsSort}
+          sortDirection={myJobsOrder}
+          onSort={handleMyJobsSort}
+          search={myJobsSearch}
+          onSearchChange={handleMyJobsSearchChange}
+          stateFilter={myStateFilter}
+          onStateFilterChange={handleMyStateFilterChange}
+          page={myJobsPage}
+          pageSize={jobsPageSize}
+          onPageChange={handleMyJobsPageChange}
+          onPageSizeChange={handleJobsPageSizeChange}
+        />
       ),
     },
     {
       id: "all",
       label: t("jobs.tabs.allJobs"),
       content: (
-        <div>
-          <JobsSearchBar
-            searchQuery={allJobsSearch}
-            onSearchChange={handleAllJobsSearchChange}
-            totalJobs={allJobsData?.meta?.totalCount || 0}
-            lastRunningCompletedBy={allJobsData?.meta?.lastRunningCompletedBy || null}
-          />
-
-          {allJobsLoading && (
-            <LoadingState label={t("common.loading")} />
-          )}
-
-          {allJobsError && (
-            <ErrorState
-              title={t("common.errorLoading")}
-              description={
-                allJobsError instanceof Error
-                  ? allJobsError.message
-                  : t("common.unknownError")
-              }
-            />
-          )}
-
-          {allJobsData && allJobsData.data && (
-            <>
-              <JobsTable
-                jobs={allJobsData.data.jobs}
-                sortColumn={allJobsSort}
-                sortDirection={allJobsOrder}
-                onSort={handleAllJobsSort}
-                filterableStates={allJobsData.meta?.filterableStates || null}
-                stateFilter={allStateFilter}
-                onStateFilterChange={handleAllStateFilterChange}
-              />
-              <Pagination
-                currentPage={allJobsPage}
-                totalPages={allJobsTotalPages}
-                onPageChange={handleAllJobsPageChange}
-                pageSize={jobsPageSize}
-                onPageSizeChange={handleJobsPageSizeChange}
-              />
-            </>
-          )}
-        </div>
+        <JobsTable
+          jobs={allJobsData?.data?.jobs ?? []}
+          meta={allJobsData?.meta}
+          isLoading={allJobsLoading}
+          error={allJobsError}
+          sortColumn={allJobsSort}
+          sortDirection={allJobsOrder}
+          onSort={handleAllJobsSort}
+          search={allJobsSearch}
+          onSearchChange={handleAllJobsSearchChange}
+          stateFilter={allStateFilter}
+          onStateFilterChange={handleAllStateFilterChange}
+          page={allJobsPage}
+          pageSize={jobsPageSize}
+          onPageChange={handleAllJobsPageChange}
+          onPageSizeChange={handleJobsPageSizeChange}
+        />
       ),
     },
     {
@@ -366,53 +297,31 @@ export function JobsPage() {
       label: t("jobs.tabs.waitingJobs"),
       content: (
         <div>
-          <JobsSearchBar
-            searchQuery={waitingJobsSearch}
-            onSearchChange={handleWaitingJobsSearchChange}
-            totalJobs={waitingJobsData?.meta?.totalCount || 0}
-            lastRunningCompletedBy={null}
-          />
-
-          {waitingJobsLoading && (
-            <LoadingState label={t("common.loading")} />
-          )}
-
-          {waitingJobsError && (
-            <ErrorState
-              title={t("common.errorLoading")}
-              description={
-                waitingJobsError instanceof Error
-                  ? waitingJobsError.message
-                  : t("common.unknownError")
-              }
+          {summaryData && (
+            <WaitingJobsSummary
+              summary={summaryData}
+              onFilterByReason={handleFilterByReason}
+              activeFilter={commentFilter}
             />
           )}
 
-          {waitingJobsData && waitingJobsData.data && (
-            <>
-              {summaryData && (
-                <WaitingJobsSummary
-                  summary={summaryData}
-                  onFilterByReason={handleFilterByReason}
-                  activeFilter={commentFilter}
-                />
-              )}
-
-              <WaitingJobsTable
-                jobs={waitingJobsData.data.jobs}
-                sortColumn={waitingJobsSort}
-                sortDirection={waitingJobsOrder}
-                onSort={handleWaitingJobsSort}
-              />
-              <Pagination
-                currentPage={waitingJobsPage}
-                totalPages={waitingJobsTotalPages}
-                onPageChange={handleWaitingJobsPageChange}
-                pageSize={jobsPageSize}
-                onPageSizeChange={handleJobsPageSizeChange}
-              />
-            </>
-          )}
+          {/* Remount on reason filter change so the search box shows the cleared search */}
+          <WaitingJobsTable
+            key={commentFilter ?? ""}
+            jobs={waitingJobsData?.data?.jobs ?? []}
+            meta={waitingJobsData?.meta}
+            isLoading={waitingJobsLoading}
+            error={waitingJobsError}
+            sortColumn={waitingJobsSort}
+            sortDirection={waitingJobsOrder}
+            onSort={handleWaitingJobsSort}
+            search={waitingJobsSearch}
+            onSearchChange={handleWaitingJobsSearchChange}
+            page={waitingJobsPage}
+            pageSize={jobsPageSize}
+            onPageChange={handleWaitingJobsPageChange}
+            onPageSizeChange={handleJobsPageSizeChange}
+          />
         </div>
       ),
     },

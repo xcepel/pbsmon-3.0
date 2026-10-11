@@ -1,10 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { useJobs } from "@/hooks/useJobs";
 import { JobsTable } from "@/components/jobs/JobsTable";
-import { Pagination } from "@/components/common/Pagination";
-import { JobsSearchBar } from "@/components/jobs/JobsSearchBar";
 import type { JobFilterableState } from "@/components/jobs/JobsFilterableHeader";
-import { ErrorState, LoadingState, EmptyState } from "@metacentrum/design-system";
 
 type SortColumn =
   | "id"
@@ -64,62 +61,24 @@ export function QueuePbsJobsTab({
     enabled: !!queueName,
   });
 
-  const jobsTotalPages = jobsData?.meta?.totalCount
-    ? Math.ceil(jobsData.meta.totalCount / jobsLimit)
-    : 0;
-
   return (
-    <div>
-      <JobsSearchBar
-        searchQuery={jobsSearch}
-        onSearchChange={onJobsSearchChange}
-        totalJobs={jobsData?.meta?.totalCount || 0}
-        lastRunningCompletedBy={jobsData?.meta?.lastRunningCompletedBy || null}
-      />
-
-      {jobsLoading && (
-        <LoadingState label={t("common.loading")} />
-      )}
-
-      {jobsError && (
-        <ErrorState
-          className="mb-4"
-          title={t("common.errorLoading")}
-          description={
-            jobsError instanceof Error
-              ? jobsError.message
-              : t("common.unknownError")
-          }
-        />
-      )}
-
-      {jobsData && jobsData.data && (
-        <>
-          <JobsTable
-            jobs={jobsData.data.jobs}
-            sortColumn={jobsSort}
-            sortDirection={jobsOrder}
-            onSort={onJobsSort}
-            filterableStates={jobsData.meta?.filterableStates || null}
-            stateFilter={stateFilter}
-            onStateFilterChange={onStateFilterChange}
-          />
-          <Pagination
-            currentPage={jobsPage}
-            totalPages={jobsTotalPages}
-            onPageChange={onJobsPageChange}
-            pageSize={jobsLimit}
-            onPageSizeChange={onJobsPageSizeChange}
-          />
-        </>
-      )}
-
-      {!jobsLoading &&
-        !jobsError &&
-        jobsData?.data &&
-        jobsData.data.jobs.length === 0 && (
-          <EmptyState title={t("queues.noJobs")} />
-        )}
-    </div>
+    <JobsTable
+      jobs={jobsData?.data?.jobs ?? []}
+      meta={jobsData?.meta}
+      isLoading={jobsLoading}
+      error={jobsError}
+      emptyTitle={t("queues.noJobs")}
+      sortColumn={jobsSort}
+      sortDirection={jobsOrder}
+      onSort={onJobsSort}
+      search={jobsSearch}
+      onSearchChange={onJobsSearchChange}
+      stateFilter={stateFilter}
+      onStateFilterChange={onStateFilterChange}
+      page={jobsPage}
+      pageSize={jobsLimit}
+      onPageChange={onJobsPageChange}
+      onPageSizeChange={onJobsPageSizeChange}
+    />
   );
 }

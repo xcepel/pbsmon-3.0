@@ -1,48 +1,44 @@
 import { useTranslation } from "react-i18next";
-import { ProjectsTableHeader } from "./ProjectsTableHeader";
-import { ProjectsTableRow } from "./ProjectsTableRow";
+import { DataTable, type PaginationProps } from "@metacentrum/design-system";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
+import { useProjectsTableColumns } from "./projectsTableColumns";
 import type { SortColumn, Project } from "./types";
-import { EmptyState } from "@metacentrum/design-system";
 
 interface ProjectsTableProps {
   projects: Project[];
   sortColumn: SortColumn;
   sortDirection: "asc" | "desc";
+  /** Called with the clicked column; the caller decides the direction. */
   onSort: (column: SortColumn) => void;
+  pagination?: PaginationProps;
 }
 
+/**
+ * Projects list without search (callers render it). The
+ * projects page uses DataTable directly with useProjectsTableColumns.
+ */
 export function ProjectsTable({
   projects,
   sortColumn,
   sortDirection,
   onSort,
+  pagination,
 }: ProjectsTableProps) {
   const { t } = useTranslation();
+  const isCompact = useMediaQuery(
+    "(max-width: 639px), (max-height: 500px) and (orientation: landscape)"
+  );
+  const columns = useProjectsTableColumns(isCompact);
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-      <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200">
-          <ProjectsTableHeader
-            sortColumn={sortColumn}
-            sortDirection={sortDirection}
-            onSort={onSort}
-          />
-          <tbody className="bg-white divide-y divide-gray-200">
-            {projects.length === 0 ? (
-              <tr>
-                <td colSpan={4}>
-                  <EmptyState title={t("projects.noProjects")} />
-                </td>
-              </tr>
-            ) : (
-              projects.map((project) => (
-                <ProjectsTableRow key={project.id} project={project} />
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
-    </div>
+    <DataTable
+      columns={columns}
+      rows={projects}
+      rowKey={(project) => project.id}
+      sort={{ key: sortColumn, direction: sortDirection }}
+      onSortChange={(next) => onSort(next.key as SortColumn)}
+      emptyTitle={t("projects.noProjects")}
+      pagination={pagination}
+    />
   );
 }

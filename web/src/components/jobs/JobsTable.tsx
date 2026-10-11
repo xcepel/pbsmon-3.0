@@ -1,80 +1,149 @@
 import { useTranslation } from "react-i18next";
-import type { JobListDTO } from "@/lib/generated-api";
-import { JobsTableHeader } from "./JobsTableHeader";
-import { JobsTableRow } from "./JobsTableRow";
+import { DataTable, type DataTableColumn } from "@metacentrum/design-system";
+import type { JobListDTO, JobsListMetaDto } from "@/lib/generated-api";
+import { JOBS_PAGE_SIZE_OPTIONS } from "@/hooks/useJobsPageSize";
+import { usePaginationLabels } from "@/lib/paginationLabels";
+import { useJobsTableColumns, useWaitingJobsTableColumns } from "./jobsTableColumns";
+import { JobsTableToolbar, useJobsSearchPlaceholder } from "./JobsTableToolbar";
 import type { JobFilterableState } from "./JobsFilterableHeader";
-import { EmptyState } from "@metacentrum/design-system";
 
-type SortColumn =
-  | "id"
-  | "name"
-  | "queue"
-  | "state"
-  | "owner"
-  | "node"
-  | "cpuReserved"
-  | "gpuReserved"
-  | "memoryReserved"
-  | "createdAt";
-
-interface JobsTableProps {
+interface JobsDataTableBaseProps<S extends string> {
   jobs: JobListDTO[];
-  sortColumn: SortColumn;
+  meta?: JobsListMetaDto;
+  isLoading?: boolean;
+  error?: unknown;
+  emptyTitle?: string;
+
+  sortColumn: S;
   sortDirection: "asc" | "desc";
-  onSort: (column: SortColumn) => void;
-  hideMachineColumn?: boolean;
-  hideUserColumn?: boolean;
+  /** Same contract as before: the caller toggles the order for the same column, new column starts desc. */
+  onSort: (column: S) => void;
+
+  search: string;
+  onSearchChange: (query: string) => void;
+
+  page: number;
+  pageSize: number;
+  onPageChange: (page: number) => void;
+  /** Omit for a fixed page size. */
+  onPageSizeChange?: (pageSize: number) => void;
+  pageSizes?: number[];
+}
+
+interface JobsDataTableProps<S extends string> extends JobsDataTableBaseProps<S> {
+  columns: DataTableColumn<JobListDTO>[];
   filterableStates?: Record<string, string> | null;
   stateFilter?: JobFilterableState;
   onStateFilterChange?: (state: JobFilterableState) => void;
 }
 
-export function JobsTable({
+function JobsDataTable<S extends string>({
+  columns,
   jobs,
+  meta,
+  isLoading,
+  error,
+  emptyTitle,
   sortColumn,
   sortDirection,
   onSort,
-  hideMachineColumn = false,
-  hideUserColumn = false,
+  search,
+  onSearchChange,
+  page,
+  pageSize,
+  onPageChange,
+  onPageSizeChange,
+  pageSizes = [...JOBS_PAGE_SIZE_OPTIONS],
   filterableStates,
   stateFilter,
   onStateFilterChange,
-}: JobsTableProps) {
+}: JobsDataTableProps<S>) {
   const { t } = useTranslation();
+  const paginationLabels = usePaginationLabels();
+  const searchPlaceholder = useJobsSearchPlaceholder();
+  const totalJobs = meta?.totalCount || 0;
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-x-auto">
-      {/* min-w-full (not min-w-max) keeps the grid bounded by the window so the
-          Name column's 1fr track grows only into spare width; when the fixed
-          minimums don't fit, overflow-x-auto on the parent provides scrolling. */}
-      <div className="min-w-full">
-        <JobsTableHeader
-          sortColumn={sortColumn}
-          sortDirection={sortDirection}
-          onSort={onSort}
-          hideMachineColumn={hideMachineColumn}
-          hideUserColumn={hideUserColumn}
+    <DataTable
+      columns={columns}
+      rows={jobs}
+      rowKey={(job) => job.id}
+      sort={{ key: sortColumn, direction: sortDirection }}
+      onSortChange={(next) => onSort(next.key as S)}
+      search={{
+        value: search,
+        onChange: onSearchChange,
+        placeholder: searchPlaceholder,
+      }}
+      toolbar={
+        <JobsTableToolbar
+          totalJobs={totalJobs}
+          lastRunningCompletedBy={meta?.lastRunningCompletedBy || null}
           filterableStates={filterableStates}
           stateFilter={stateFilter}
           onStateFilterChange={onStateFilterChange}
         />
+      }
+      loading={isLoading}
+      loadingLabel={t("common.loading")}
+      error={
+        error
+          ? {
+              title: t("common.errorLoading"),
+              description:
+                error instanceof Error ? error.message : t("common.unknownError"),
+            }
+          : undefined
+      }
+      emptyTitle={emptyTitle ?? t("jobs.noJobsFound")}
+      pagination={{
+        page,
+        pageSize,
+        totalItems: totalJobs,
+        onChange: (next) => {
+          if (next.pageSize !== pageSize) onPageSizeChange?.(next.pageSize);
+          else onPageChange(next.page);
+        },
+        pageSizes: onPageSizeChange ? pageSizes : [pageSize],
+        labels: paginationLabels,
+      }}
+    />
+  );
+}
 
-        {/* Table Body */}
-        <div>
-          {jobs.length === 0 ? (
-            <EmptyState title={t("jobs.noJobsFound")} />
-          ) : (
-            jobs.map((job) => (
-              <JobsTableRow
-                key={job.id}
-                job={job}
-                hideMachineColumn={hideMachineColumn}
-                hideUserColumn={hideUserColumn}
-              />
-            ))
-          )}
-        </div>
-      </div>
-    </div>
+interface JobsTableProps<S extends string> extends JobsDataTableBaseProps<S> {
+  hideMachineColumn?: boolean;
+  hideUserColumn?: boolean;
+  /** Omit onStateFilterChange to hide the state filter. */
+  stateFilter?: JobFilterableState;
+  onStateFilterChange?: (state: JobFilterableState) => void;
+}
+
+/** Job list (DataTable): state filter + total count in the toolbar, server-side sort/search/paging. */
+export function JobsTable<S extends string>({
+  hideMachineColumn,
+  hideUserColumn,
+  ...props
+}: JobsTableProps<S>) {
+  const columns = useJobsTableColumns({ hideMachineColumn, hideUserColumn });
+  return (
+    <JobsDataTable
+      {...props}
+      columns={columns}
+      filterableStates={props.meta?.filterableStates || null}
+    />
+  );
+}
+
+/** Waiting (queued) jobs list: waiting-reason column, no state filter. */
+export function WaitingJobsTable<S extends string>(props: JobsDataTableBaseProps<S>) {
+  const columns = useWaitingJobsTableColumns();
+  // Waiting jobs never showed the "completed by" estimate, just the plain total.
+  return (
+    <JobsDataTable
+      {...props}
+      meta={props.meta && { ...props.meta, lastRunningCompletedBy: null }}
+      columns={columns}
+    />
   );
 }

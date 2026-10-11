@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 import type { UserFairshareDTO } from "@/lib/generated-api";
-import { EmptyState } from "@metacentrum/design-system";
+import { DataTable, type DataTableColumn } from "@metacentrum/design-system";
 
 interface UserFairshareSectionProps {
   fairsharePerServer: UserFairshareDTO[];
@@ -88,6 +88,70 @@ export function UserFairshareSection({
     }
   };
 
+  const renderPriority = (item: UserFairshareDTO) => {
+    // Handle ranking - it might be number or Record<string, any> from generated types
+    const rankingValue =
+      typeof item.ranking === "number"
+        ? item.ranking
+        : item.ranking !== null
+          ? Number(item.ranking)
+          : null;
+
+    // totalUsers will be available after API client regeneration
+    const totalUsers =
+      typeof (item as any).totalUsers === "number"
+        ? (item as any).totalUsers
+        : (item as any).totalUsers !== null &&
+            (item as any).totalUsers !== undefined
+          ? Number((item as any).totalUsers)
+          : null;
+
+    // Calculate users before: ranking 1 (worst) = totalUsers - 1 users before
+    // ranking max (best) = 0 users before
+    // Formula: usersBefore = totalUsers - ranking
+    const usersBefore =
+      rankingValue !== null &&
+      rankingValue !== undefined &&
+      !isNaN(rankingValue) &&
+      totalUsers !== null &&
+      totalUsers !== undefined &&
+      !isNaN(totalUsers)
+        ? totalUsers - rankingValue
+        : null;
+
+    return usersBefore !== null ? (
+      <div className="flex items-center gap-2 text-sm text-gray-600">
+        {getRankingIcon(rankingValue, totalUsers)}
+        <span>
+          {usersBefore === 0
+            ? t("users.noUsersBeforeYou")
+            : t("users.usersBeforeYou", {
+                count: usersBefore,
+              })}
+        </span>
+      </div>
+    ) : (
+      <span className="text-sm text-gray-600">-</span>
+    );
+  };
+
+  const columns: DataTableColumn<UserFairshareDTO>[] = [
+    {
+      key: "server",
+      header: t("users.server"),
+      render: (item) => (
+        <span className="break-words text-sm font-medium text-gray-900">
+          {item.server}
+        </span>
+      ),
+    },
+    {
+      key: "priority",
+      header: t("users.fairsharePriority"),
+      render: renderPriority,
+    },
+  ];
+
   return (
     <div className="px-4 sm:px-6 py-4">
       <div className="flex items-center gap-2 mb-4">
@@ -115,81 +179,12 @@ export function UserFairshareSection({
           </div>
         </div>
       </div>
-      {fairsharePerServer.length === 0 ? (
-        <EmptyState title={t("users.noFairshareData")} />
-      ) : (
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-3 sm:px-4 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  {t("users.server")}
-                </th>
-                <th className="px-3 sm:px-4 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  {t("users.fairsharePriority")}
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {fairsharePerServer.map((item) => {
-                // Handle ranking - it might be number or Record<string, any> from generated types
-                const rankingValue =
-                  typeof item.ranking === "number"
-                    ? item.ranking
-                    : item.ranking !== null
-                      ? Number(item.ranking)
-                      : null;
-
-                // totalUsers will be available after API client regeneration
-                const totalUsers =
-                  typeof (item as any).totalUsers === "number"
-                    ? (item as any).totalUsers
-                    : (item as any).totalUsers !== null &&
-                        (item as any).totalUsers !== undefined
-                      ? Number((item as any).totalUsers)
-                      : null;
-
-                // Calculate users before: ranking 1 (worst) = totalUsers - 1 users before
-                // ranking max (best) = 0 users before
-                // Formula: usersBefore = totalUsers - ranking
-                const usersBefore =
-                  rankingValue !== null &&
-                  rankingValue !== undefined &&
-                  !isNaN(rankingValue) &&
-                  totalUsers !== null &&
-                  totalUsers !== undefined &&
-                  !isNaN(totalUsers)
-                    ? totalUsers - rankingValue
-                    : null;
-
-                return (
-                  <tr key={item.server} className="hover:bg-gray-50">
-                    <td className="px-3 sm:px-4 py-2 sm:py-3 whitespace-normal sm:whitespace-nowrap break-words text-sm font-medium text-gray-900">
-                      {item.server}
-                    </td>
-                    <td className="px-3 sm:px-4 py-2 sm:py-3 whitespace-normal sm:whitespace-nowrap text-sm text-gray-600">
-                      {usersBefore !== null ? (
-                        <div className="flex items-center gap-2">
-                          {getRankingIcon(rankingValue, totalUsers)}
-                          <span>
-                            {usersBefore === 0
-                              ? t("users.noUsersBeforeYou")
-                              : t("users.usersBeforeYou", {
-                                  count: usersBefore,
-                                })}
-                          </span>
-                        </div>
-                      ) : (
-                        "-"
-                      )}
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-      )}
+      <DataTable
+        columns={columns}
+        rows={fairsharePerServer}
+        rowKey={(item) => item.server}
+        emptyTitle={t("users.noFairshareData")}
+      />
     </div>
   );
 }
