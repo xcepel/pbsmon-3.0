@@ -184,7 +184,7 @@ export function QueueDetailContent({
   const totalJobs = typeof queue.totalJobs === "number" ? queue.totalJobs : 0;
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="space-y-6">
       {/* Basic Information */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200">
         <div className="px-6 py-4 border-b border-gray-200">

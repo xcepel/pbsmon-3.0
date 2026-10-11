@@ -1,6 +1,4 @@
-import { forwardRef } from "react";
-import type { AnchorHTMLAttributes } from "react";
-import { Link, Outlet, useLocation } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Icon } from "@iconify/react";
 import { Footer, Header, type HeaderNavItem } from "@metacentrum/design-system";
@@ -10,12 +8,7 @@ import { ImpersonationBanner } from "@/components/common/ImpersonationBanner";
 import { DataFreshnessFooter } from "@/components/layout/DataFreshnessFooter";
 import { useImpersonation } from "@/contexts/ImpersonationContext";
 import { ApiError } from "@/lib/generated-api/core/ApiError";
-
-const RouterLink = forwardRef<
-  HTMLAnchorElement,
-  { href: string } & AnchorHTMLAttributes<HTMLAnchorElement>
->(({ href, ...rest }, ref) => <Link ref={ref} to={href} {...rest} />);
-RouterLink.displayName = "RouterLink";
+import { RouterLink } from "@/components/layout/RouterLink";
 
 export function AppLayout() {
   const { t, i18n } = useTranslation();

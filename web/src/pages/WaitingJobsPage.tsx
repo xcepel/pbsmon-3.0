@@ -6,6 +6,7 @@ import { JobsSearchBar } from "@/components/jobs/JobsSearchBar";
 import { WaitingJobsTable } from "@/components/jobs/WaitingJobsTable";
 import { WaitingJobsSummary } from "@/components/jobs/WaitingJobsSummary";
 import { Pagination } from "@/components/common/Pagination";
+import { PageContainer, PageHeader } from "@metacentrum/design-system";
 
 type SortColumn =
   | "id"
@@ -80,62 +81,54 @@ export function WaitingJobsPage() {
     : 0;
 
   return (
-    <>
-      <header className="bg-white border-b border-gray-200 px-6 py-4">
-        <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-primary-900">
-            {t("pages.waitingJobs")}
-          </h1>
+    <PageContainer>
+      <PageHeader title={t("pages.waitingJobs")} />
+      {isLoading && (
+        <div className="flex items-center justify-center py-12">
+          <div className="text-gray-600">{t("common.loading")}</div>
         </div>
-      </header>
-      <div className="p-6">
-        {isLoading && (
-          <div className="flex items-center justify-center py-12">
-            <div className="text-gray-600">{t("common.loading")}</div>
+      )}
+
+      {error && (
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+          <div className="text-red-800">
+            {t("common.errorLoading")}{" "}
+            {error instanceof Error
+              ? error.message
+              : t("common.unknownError")}
           </div>
-        )}
+        </div>
+      )}
 
-        {error && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-            <div className="text-red-800">
-              {t("common.errorLoading")}{" "}
-              {error instanceof Error
-                ? error.message
-                : t("common.unknownError")}
-            </div>
-          </div>
-        )}
+      {data && data.data && (
+        <>
+          {summaryData && (
+            <WaitingJobsSummary
+              summary={summaryData}
+              onFilterByReason={handleFilterByReason}
+              activeFilter={commentFilter}
+            />
+          )}
 
-        {data && data.data && (
-          <>
-            {summaryData && (
-              <WaitingJobsSummary
-                summary={summaryData}
-                onFilterByReason={handleFilterByReason}
-                activeFilter={commentFilter}
-              />
-            )}
-
-            <JobsSearchBar
-              searchQuery={search}
-              onSearchChange={handleSearchChange}
-              totalJobs={data?.meta?.totalCount || 0}
-              lastRunningCompletedBy={null}
-            />
-            <WaitingJobsTable
-              jobs={data.data.jobs}
-              sortColumn={sort}
-              sortDirection={order}
-              onSort={handleSort}
-            />
-            <Pagination
-              currentPage={page}
-              totalPages={totalPages}
-              onPageChange={handlePageChange}
-            />
-          </>
-        )}
-      </div>
-    </>
+          <JobsSearchBar
+            searchQuery={search}
+            onSearchChange={handleSearchChange}
+            totalJobs={data?.meta?.totalCount || 0}
+            lastRunningCompletedBy={null}
+          />
+          <WaitingJobsTable
+            jobs={data.data.jobs}
+            sortColumn={sort}
+            sortDirection={order}
+            onSort={handleSort}
+          />
+          <Pagination
+            currentPage={page}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+          />
+        </>
+      )}
+    </PageContainer>
   );
 }

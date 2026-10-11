@@ -2,6 +2,7 @@ import { useTranslation } from "react-i18next";
 import { QsubForm } from "@/components/qsub/QsubForm";
 import { QsubResults } from "@/components/qsub/QsubResults";
 import { useQsubPreview } from "@/hooks/useQsubPreview";
+import { PageContainer, PageHeader } from "@metacentrum/design-system";
 
 export function QsubAssemblerPage() {
   const { t } = useTranslation();
@@ -12,15 +13,9 @@ export function QsubAssemblerPage() {
   };
 
   return (
-    <>
-      <header className="bg-white border-b border-gray-200 px-4 sm:px-6 py-3 sm:py-4">
-        <div className="flex items-center justify-between">
-          <h1 className="text-xl sm:text-2xl font-bold text-primary-900">
-            {t("pages.qsubAssembler")}
-          </h1>
-        </div>
-      </header>
-      <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
+    <PageContainer>
+      <PageHeader title={t("pages.qsubAssembler")} />
+      <div className="space-y-4 sm:space-y-6">
         <QsubForm onSubmit={handleSubmit} />
 
         {previewMutation.isPending && (
@@ -49,6 +44,6 @@ export function QsubAssemblerPage() {
           />
         )}
       </div>
-    </>
+    </PageContainer>
   );
 }

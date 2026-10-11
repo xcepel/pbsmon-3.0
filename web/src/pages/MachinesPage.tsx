@@ -7,6 +7,7 @@ import { QuickLinksSidebar } from "@/components/infrastructure/QuickLinksSidebar
 import { MachineSearchBar } from "@/components/infrastructure/MachineSearchBar";
 import { MachinesHeader } from "@/components/infrastructure/MachinesHeader";
 import { MachineLegend } from "@/components/infrastructure/MachineLegend";
+import { PageContainer, PageHeader } from "@metacentrum/design-system";
 
 export function MachinesPage() {
   const [machineSearch, setMachineSearch] = useState("");
@@ -42,16 +43,10 @@ export function MachinesPage() {
   const currentLanguage = i18n.language as "cs" | "en";
 
   return (
-    <>
-      <header className="bg-white border-b border-gray-200 px-4 sm:px-6 py-3 sm:py-4">
-        <div className="flex items-center justify-between">
-          <h1 className="text-xl sm:text-2xl font-bold text-primary-900">
-            {t("pages.machines")}
-          </h1>
-        </div>
-      </header>
+    <PageContainer>
+      <PageHeader title={t("pages.machines")} />
 
-      <div className="flex gap-6 p-4 sm:p-6 pb-0">
+      <div className="flex gap-6">
         <div className="flex-1">
           {filterIsLoading && (
             <div className="flex items-center justify-center py-12">
@@ -80,7 +75,7 @@ export function MachinesPage() {
         </div>
       </div>
 
-      <div className="flex gap-6 p-4 sm:p-6 pt-0">
+      <div className="flex gap-6">
         {/* Main Content */}
         <div className="flex-1">
 
@@ -135,6 +130,6 @@ export function MachinesPage() {
           />
         )}
       </div>
-    </>
+    </PageContainer>
   );
 }

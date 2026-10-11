@@ -5,6 +5,7 @@ import { Pagination } from "@/components/common/Pagination";
 import { ProjectsSearchBar } from "@/components/projects/ProjectsSearchBar";
 import { ProjectsTable } from "@/components/projects/ProjectsTable";
 import type { SortColumn, Project } from "@/components/projects/types";
+import { PageContainer, PageHeader } from "@metacentrum/design-system";
 
 export function ProjectsPage() {
   const { t } = useTranslation();
@@ -69,55 +70,47 @@ export function ProjectsPage() {
   const projects: Project[] = data?.data?.projects || [];
 
   return (
-    <>
-      <header className="bg-white border-b border-gray-200 px-4 sm:px-6 py-3 sm:py-4">
-        <div className="flex items-center justify-between">
-          <h1 className="text-xl sm:text-2xl font-bold text-primary-900">
-            {t("pages.projects")}
-          </h1>
+    <PageContainer>
+      <PageHeader title={t("pages.projects")} />
+      <ProjectsSearchBar
+        searchQuery={search}
+        onSearchChange={handleSearchChange}
+        totalProjects={totalCount}
+      />
+
+      {isLoading && (
+        <div className="flex items-center justify-center py-12">
+          <div className="text-gray-600">{t("common.loading")}</div>
         </div>
-      </header>
-      <div className="p-4 sm:p-6">
-        <ProjectsSearchBar
-          searchQuery={search}
-          onSearchChange={handleSearchChange}
-          totalProjects={totalCount}
-        />
+      )}
 
-        {isLoading && (
-          <div className="flex items-center justify-center py-12">
-            <div className="text-gray-600">{t("common.loading")}</div>
+      {error && (
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+          <div className="text-red-800">
+            {t("common.errorLoading")}{" "}
+            {error instanceof Error
+              ? error.message
+              : t("common.unknownError")}
           </div>
-        )}
+        </div>
+      )}
 
-        {error && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-            <div className="text-red-800">
-              {t("common.errorLoading")}{" "}
-              {error instanceof Error
-                ? error.message
-                : t("common.unknownError")}
-            </div>
-          </div>
-        )}
+      {data && (
+        <>
+          <ProjectsTable
+            projects={projects}
+            sortColumn={sort}
+            sortDirection={order}
+            onSort={handleSort}
+          />
 
-        {data && (
-          <>
-            <ProjectsTable
-              projects={projects}
-              sortColumn={sort}
-              sortDirection={order}
-              onSort={handleSort}
-            />
-
-            <Pagination
-              currentPage={page}
-              totalPages={totalPages}
-              onPageChange={handlePageChange}
-            />
-          </>
-        )}
-      </div>
-    </>
+          <Pagination
+            currentPage={page}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+          />
+        </>
+      )}
+    </PageContainer>
   );
 }

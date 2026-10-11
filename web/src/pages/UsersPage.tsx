@@ -8,6 +8,7 @@ import { UsersSearchBar } from "@/components/users/UsersSearchBar";
 import { UsersTable } from "@/components/users/UsersTable";
 import { Pagination } from "@/components/common/Pagination";
 import type { SortColumn } from "@/components/users/types";
+import { PageContainer, PageHeader } from "@metacentrum/design-system";
 
 export function UsersPage() {
   const { t } = useTranslation();
@@ -70,58 +71,50 @@ export function UsersPage() {
     : 0;
 
   return (
-    <>
-      <header className="bg-white border-b border-gray-200 px-4 sm:px-6 py-3 sm:py-4">
-        <div className="flex items-center justify-between">
-          <h1 className="text-xl sm:text-2xl font-bold text-primary-900">
-            {t("pages.users")}
-          </h1>
+    <PageContainer>
+      <PageHeader title={t("pages.users")} />
+      <UsersSearchBar
+        searchQuery={search}
+        onSearchChange={handleSearchChange}
+        totalUsers={data?.meta?.totalCount || 0}
+      />
+
+      {isLoading && (
+        <div className="flex items-center justify-center py-12">
+          <div className="text-gray-600">{t("common.loading")}</div>
         </div>
-      </header>
-      <div className="p-4 sm:p-6">
-        <UsersSearchBar
-          searchQuery={search}
-          onSearchChange={handleSearchChange}
-          totalUsers={data?.meta?.totalCount || 0}
-        />
+      )}
 
-        {isLoading && (
-          <div className="flex items-center justify-center py-12">
-            <div className="text-gray-600">{t("common.loading")}</div>
+      {error && (
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+          <div className="text-red-800">
+            {t("common.errorLoading")}{" "}
+            {error instanceof Error
+              ? error.message
+              : t("common.unknownError")}
           </div>
-        )}
+        </div>
+      )}
 
-        {error && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-            <div className="text-red-800">
-              {t("common.errorLoading")}{" "}
-              {error instanceof Error
-                ? error.message
-                : t("common.unknownError")}
-            </div>
-          </div>
-        )}
-
-        {data && data.data && (
-          <>
-            <UsersTable
-              users={data.data.users}
-              fairshareServers={fairshareServers}
-              maxFairshare={maxFairshare}
-              sortColumn={sort as SortColumn}
-              sortDirection={order}
-              onSort={handleSort}
-              isAdmin={isAdmin}
-              onImpersonate={handleImpersonate}
-            />
-            <Pagination
-              currentPage={page}
-              totalPages={totalPages}
-              onPageChange={handlePageChange}
-            />
-          </>
-        )}
-      </div>
-    </>
+      {data && data.data && (
+        <>
+          <UsersTable
+            users={data.data.users}
+            fairshareServers={fairshareServers}
+            maxFairshare={maxFairshare}
+            sortColumn={sort as SortColumn}
+            sortDirection={order}
+            onSort={handleSort}
+            isAdmin={isAdmin}
+            onImpersonate={handleImpersonate}
+          />
+          <Pagination
+            currentPage={page}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+          />
+        </>
+      )}
+    </PageContainer>
   );
 }

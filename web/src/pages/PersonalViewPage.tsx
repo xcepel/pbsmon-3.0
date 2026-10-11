@@ -16,6 +16,7 @@ import type {
   Project,
 } from "@/components/projects/types";
 import type { JobFilterableState } from "@/components/jobs/JobsFilterableHeader";
+import { PageContainer, PageHeader } from "@metacentrum/design-system";
 
 type JobsSortColumnType =
   | "id"
@@ -338,15 +339,9 @@ export function PersonalViewPage() {
     : 0;
 
   return (
-    <>
-      <header className="bg-white border-b border-gray-200 px-4 sm:px-6 py-3 sm:py-4">
-        <div className="flex items-center justify-between">
-          <h1 className="text-xl sm:text-2xl font-bold text-primary-900">
-            {t("pages.personalView")}
-          </h1>
-        </div>
-      </header>
-      <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
+    <PageContainer>
+      <PageHeader title={t("pages.personalView")} />
+      <div className="space-y-4 sm:space-y-6">
 
         {/* User details Section */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6">
@@ -632,6 +627,6 @@ export function PersonalViewPage() {
           )}
         </div>
       </div>
-    </>
+    </PageContainer>
   );
 }

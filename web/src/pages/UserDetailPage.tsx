@@ -16,6 +16,7 @@ import { UserAccountingSection } from "@/components/users/UserAccountingSection"
 import { UserJobsTab } from "@/components/users/UserJobsTab";
 import { UserQueuesTab } from "@/components/users/UserQueuesTab";
 import type { JobFilterableState } from "@/components/jobs/JobsFilterableHeader";
+import { PageContainer, PageHeader } from "@metacentrum/design-system";
 
 type SortColumn =
   | "id"
@@ -124,63 +125,39 @@ export function UserDetailPage() {
 
   if (isLoading) {
     return (
-      <>
-        <header className="bg-white border-b border-gray-200 px-4 sm:px-6 py-3 sm:py-4">
-          <div className="flex items-center justify-between">
-            <h1 className="text-xl sm:text-2xl font-bold text-primary-900">
-              {t("pages.userDetail")}
-            </h1>
-          </div>
-        </header>
-        <div className="p-4 sm:p-6">
-          <div className="flex items-center justify-center py-12">
-            <div className="text-gray-600">{t("common.loading")}</div>
-          </div>
+      <PageContainer>
+        <PageHeader title={t("pages.userDetail")} />
+        <div className="flex items-center justify-center py-12">
+          <div className="text-gray-600">{t("common.loading")}</div>
         </div>
-      </>
+      </PageContainer>
     );
   }
 
   if (error) {
     return (
-      <>
-        <header className="bg-white border-b border-gray-200 px-4 sm:px-6 py-3 sm:py-4">
-          <div className="flex items-center justify-between">
-            <h1 className="text-xl sm:text-2xl font-bold text-primary-900">
-              {t("pages.userDetail")}
-            </h1>
-          </div>
-        </header>
-        <div className="p-4 sm:p-6">
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-            <div className="text-red-800">
-              {t("common.errorLoading")}{" "}
-              {error instanceof Error
-                ? error.message
-                : t("common.unknownError")}
-            </div>
+      <PageContainer>
+        <PageHeader title={t("pages.userDetail")} />
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+          <div className="text-red-800">
+            {t("common.errorLoading")}{" "}
+            {error instanceof Error
+              ? error.message
+              : t("common.unknownError")}
           </div>
         </div>
-      </>
+      </PageContainer>
     );
   }
 
   if (!data) {
     return (
-      <>
-        <header className="bg-white border-b border-gray-200 px-4 sm:px-6 py-3 sm:py-4">
-          <div className="flex items-center justify-between">
-            <h1 className="text-xl sm:text-2xl font-bold text-primary-900">
-              {t("pages.userDetail")}
-            </h1>
-          </div>
-        </header>
-        <div className="p-4 sm:p-6">
-          <div className="text-center text-gray-500 py-12">
-            {t("users.userNotFound")}
-          </div>
+      <PageContainer>
+        <PageHeader title={t("pages.userDetail")} />
+        <div className="text-center text-gray-500 py-12">
+          {t("users.userNotFound")}
         </div>
-      </>
+      </PageContainer>
     );
   }
 
@@ -221,25 +198,22 @@ export function UserDetailPage() {
   ];
 
   return (
-    <>
-      <header className="bg-white border-b border-gray-200 px-4 sm:px-6 py-3 sm:py-4">
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <h1 className="text-xl sm:text-2xl font-bold text-primary-900 break-words">
-            {t("pages.userDetail")}
-          </h1>
-
-          {/* Actions Column - Only for admins */}
-          {isAdmin && (
+    <PageContainer>
+      <PageHeader
+        title={t("pages.userDetail")}
+        actions={
+          // Only for admins
+          isAdmin && (
             <button
               onClick={handleImpersonate}
               className="px-3 py-1 text-sm font-medium text-primary-600 hover:text-primary-800 hover:bg-primary-50 rounded border border-primary-300 hover:border-primary-400"
             >
               {t("users.impersonate")}
             </button>
-          )}
-        </div>
-      </header>
-      <div className="p-4 sm:p-6">
+          )
+        }
+      />
+      <div>
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-6">
           <UserBasicInfo user={data} />
           <UserFairshareSection fairsharePerServer={data.fairsharePerServer} />
@@ -261,6 +235,6 @@ export function UserDetailPage() {
           </div>
         </div>
       </div>
-    </>
+    </PageContainer>
   );
 }

@@ -40,7 +40,7 @@ export function StorageSpacesContent({ data, quotasData }: StorageSpacesContentP
   const { t } = useTranslation();
 
   return (
-    <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {quotasData && <UserStorageQuotasSection data={quotasData} />}
 
       {/* Scratch Storage Section */}

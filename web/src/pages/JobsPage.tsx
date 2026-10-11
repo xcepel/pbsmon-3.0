@@ -13,6 +13,7 @@ import { Tabs } from "@/components/common/Tabs";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { useJobsPageSize } from "@/hooks/useJobsPageSize";
 import type { JobFilterableState } from "@/components/jobs/JobsFilterableHeader";
+import { PageContainer, PageHeader } from "@metacentrum/design-system";
 
 type SortColumn =
   | "id"
@@ -426,27 +427,19 @@ export function JobsPage() {
   const visibleTabs = isMobile ? tabs.filter((tab) => tab.id !== "waiting") : tabs;
 
   return (
-    <>
-      <header className="bg-white border-b border-gray-200 px-4 sm:px-6 py-3 sm:py-4">
-        <div className="flex items-center justify-between">
-          <h1 className="text-xl sm:text-2xl font-bold text-primary-900">
-            {t("pages.jobs")}
-          </h1>
-        </div>
-      </header>
-      <div className="p-4 sm:p-6">
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-          <div className="px-4 sm:px-6 py-4">
-            <Tabs
-              tabs={visibleTabs}
-              activeTab={activeTab}
-              onTabChange={(tabId) =>
-                setActiveTab(tabId as "all" | "waiting" | "my")
-              }
-            />
-          </div>
+    <PageContainer>
+      <PageHeader title={t("pages.jobs")} />
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+        <div className="px-4 sm:px-6 py-4">
+          <Tabs
+            tabs={visibleTabs}
+            activeTab={activeTab}
+            onTabChange={(tabId) =>
+              setActiveTab(tabId as "all" | "waiting" | "my")
+            }
+          />
         </div>
       </div>
-    </>
+    </PageContainer>
   );
 }
