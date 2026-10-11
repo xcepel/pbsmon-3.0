@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import type { UserStorageQuotasData } from "@/hooks/useUserStorageQuotas";
+import { EmptyState } from "@metacentrum/design-system";
 
 interface UserStorageQuotasSectionProps {
   data: UserStorageQuotasData;
@@ -38,9 +39,7 @@ export function UserStorageQuotasSection({
         <h2 className="text-xl font-semibold text-gray-900 mb-4">
           {t("storageSpaces.userQuotas.title")}
         </h2>
-        <p className="text-gray-500 text-sm">
-          {t("storageSpaces.userQuotas.noData")}
-        </p>
+        <EmptyState title={t("storageSpaces.userQuotas.noData")} />
       </div>
     );
   }

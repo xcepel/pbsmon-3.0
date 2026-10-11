@@ -13,7 +13,7 @@ import { Tabs } from "@/components/common/Tabs";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { useJobsPageSize } from "@/hooks/useJobsPageSize";
 import type { JobFilterableState } from "@/components/jobs/JobsFilterableHeader";
-import { PageContainer, PageHeader } from "@metacentrum/design-system";
+import { PageContainer, PageHeader, ErrorState, LoadingState } from "@metacentrum/design-system";
 
 type SortColumn =
   | "id"
@@ -273,20 +273,18 @@ export function JobsPage() {
           />
 
           {myJobsLoading && (
-            <div className="flex items-center justify-center py-12">
-              <div className="text-gray-600">{t("common.loading")}</div>
-            </div>
+            <LoadingState label={t("common.loading")} />
           )}
 
           {myJobsError && (
-            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-              <div className="text-red-800">
-                {t("common.errorLoading")}{" "}
-                {myJobsError instanceof Error
+            <ErrorState
+              title={t("common.errorLoading")}
+              description={
+                myJobsError instanceof Error
                   ? myJobsError.message
-                  : t("common.unknownError")}
-              </div>
-            </div>
+                  : t("common.unknownError")
+              }
+            />
           )}
 
           {myJobsData && myJobsData.data && (
@@ -326,20 +324,18 @@ export function JobsPage() {
           />
 
           {allJobsLoading && (
-            <div className="flex items-center justify-center py-12">
-              <div className="text-gray-600">{t("common.loading")}</div>
-            </div>
+            <LoadingState label={t("common.loading")} />
           )}
 
           {allJobsError && (
-            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-              <div className="text-red-800">
-                {t("common.errorLoading")}{" "}
-                {allJobsError instanceof Error
+            <ErrorState
+              title={t("common.errorLoading")}
+              description={
+                allJobsError instanceof Error
                   ? allJobsError.message
-                  : t("common.unknownError")}
-              </div>
-            </div>
+                  : t("common.unknownError")
+              }
+            />
           )}
 
           {allJobsData && allJobsData.data && (
@@ -378,20 +374,18 @@ export function JobsPage() {
           />
 
           {waitingJobsLoading && (
-            <div className="flex items-center justify-center py-12">
-              <div className="text-gray-600">{t("common.loading")}</div>
-            </div>
+            <LoadingState label={t("common.loading")} />
           )}
 
           {waitingJobsError && (
-            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-              <div className="text-red-800">
-                {t("common.errorLoading")}{" "}
-                {waitingJobsError instanceof Error
+            <ErrorState
+              title={t("common.errorLoading")}
+              description={
+                waitingJobsError instanceof Error
                   ? waitingJobsError.message
-                  : t("common.unknownError")}
-              </div>
-            </div>
+                  : t("common.unknownError")
+              }
+            />
           )}
 
           {waitingJobsData && waitingJobsData.data && (

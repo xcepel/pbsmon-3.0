@@ -3,6 +3,7 @@ import { useQueues } from "@/hooks/useQueues";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import type { QueueListDTO } from "@/lib/generated-api";
 import { QueueTreeNode } from "@/components/common/QueueTreeNode";
+import { LoadingState, ErrorState, EmptyState } from "@metacentrum/design-system";
 
 interface MachinePbsQueuesTabProps {
   nodeQueues: QueueListDTO[];
@@ -53,30 +54,24 @@ export function MachinePbsQueuesTab({ nodeQueues }: MachinePbsQueuesTabProps) {
     : [];
 
   if (isLoading) {
-    return (
-      <div className="px-4 sm:px-6 py-4">
-        <div className="text-gray-500">{t("queues.loading")}</div>
-      </div>
-    );
+    return <LoadingState label={t("queues.loading")} />;
   }
 
   if (error) {
     return (
       <div className="px-4 sm:px-6 py-4">
-        <div className="text-red-600">
-          {t("queues.errorLoading")}{" "}
-          {error instanceof Error ? error.message : t("queues.unknownError")}
-        </div>
+        <ErrorState
+          title={t("queues.errorLoading")}
+          description={
+            error instanceof Error ? error.message : t("queues.unknownError")
+          }
+        />
       </div>
     );
   }
 
   if (filteredQueues.length === 0) {
-    return (
-      <div className="px-4 sm:px-6 py-4">
-        <div className="text-gray-500">{t("machines.noQueues")}</div>
-      </div>
-    );
+    return <EmptyState title={t("machines.noQueues")} />;
   }
 
   return (

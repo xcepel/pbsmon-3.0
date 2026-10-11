@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { PrintAttributeValue } from "@/components/common/PrintAttribute";
+import { EmptyState } from "@metacentrum/design-system";
 
 interface MachinePbsSystemInfoTabProps {
   rawAttributes: Record<string, string> | null;
@@ -42,7 +43,7 @@ export function MachinePbsSystemInfoTab({
           </table>
         </div>
       ) : (
-        <div className="text-gray-500">{t("machines.noSystemInfo")}</div>
+        <EmptyState title={t("machines.noSystemInfo")} />
       )}
     </div>
   );

@@ -6,6 +6,7 @@ import Select from "react-select";
 import { Tooltip } from "react-tooltip";
 import { Icon } from "@iconify/react";
 import type { QsubFieldConfigDto } from "@/lib/generated-api";
+import { LoadingState, ErrorState } from "@metacentrum/design-system";
 
 interface QsubFormValues {
   [key: string]: any;
@@ -56,19 +57,11 @@ export function QsubForm({ onSubmit }: QsubFormProps) {
   }, [config, reset]);
 
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center p-8">
-        <div className="text-gray-500">Loading form configuration...</div>
-      </div>
-    );
+    return <LoadingState label="Loading form configuration..." />;
   }
 
   if (!config) {
-    return (
-      <div className="flex items-center justify-center p-8">
-        <div className="text-red-500">Failed to load form configuration</div>
-      </div>
-    );
+    return <ErrorState title="Failed to load form configuration" />;
   }
 
   const basicFields = config.fields.filter((f: QsubFieldConfigDto) => f.category === "basic");

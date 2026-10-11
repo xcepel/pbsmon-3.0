@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next";
 import type { JobDetailDTO } from "@/lib/generated-api";
 import { PrintAttributeValue } from "@/components/common/PrintAttribute";
+import { EmptyState } from "@metacentrum/design-system";
 
 interface JobSystemInfoSectionProps {
   job: JobDetailDTO;
@@ -18,7 +19,7 @@ export function JobSystemInfoSection({ job }: JobSystemInfoSectionProps) {
         <h2 className="text-lg font-semibold text-gray-900 mb-4">
           {t("jobs.systemInformation")}
         </h2>
-        <div className="text-gray-500">{t("machines.noSystemInfo")}</div>
+        <EmptyState title={t("machines.noSystemInfo")} />
       </div>
     );
   }

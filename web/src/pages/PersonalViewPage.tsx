@@ -16,7 +16,7 @@ import type {
   Project,
 } from "@/components/projects/types";
 import type { JobFilterableState } from "@/components/jobs/JobsFilterableHeader";
-import { PageContainer, PageHeader } from "@metacentrum/design-system";
+import { PageContainer, PageHeader, ErrorState, LoadingState } from "@metacentrum/design-system";
 
 type JobsSortColumnType =
   | "id"
@@ -548,19 +548,18 @@ export function PersonalViewPage() {
             lastRunningCompletedBy={userJobsData?.meta?.lastRunningCompletedBy || null}
           />
           {userJobsLoading && (
-            <div className="flex items-center justify-center py-12">
-              <div className="text-gray-600">{t("common.loading")}</div>
-            </div>
+            <LoadingState label={t("common.loading")} />
           )}
           {userJobsError && (
-            <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
-              <div className="text-red-800">
-                {t("common.errorLoading")}{" "}
-                {userJobsError instanceof Error
+            <ErrorState
+              className="mb-4"
+              title={t("common.errorLoading")}
+              description={
+                userJobsError instanceof Error
                   ? userJobsError.message
-                  : t("common.unknownError")}
-              </div>
-            </div>
+                  : t("common.unknownError")
+              }
+            />
           )}
           {userJobsData && (
             <>
@@ -596,19 +595,18 @@ export function PersonalViewPage() {
             totalProjects={finalProjectsTotalCount}
           />
           {userProjectsLoading && (
-            <div className="flex items-center justify-center py-12">
-              <div className="text-gray-600">{t("common.loading")}</div>
-            </div>
+            <LoadingState label={t("common.loading")} />
           )}
           {userProjectsError && (
-            <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
-              <div className="text-red-800">
-                {t("common.errorLoading")}{" "}
-                {userProjectsError instanceof Error
+            <ErrorState
+              className="mb-4"
+              title={t("common.errorLoading")}
+              description={
+                userProjectsError instanceof Error
                   ? userProjectsError.message
-                  : t("common.unknownError")}
-              </div>
-            </div>
+                  : t("common.unknownError")
+              }
+            />
           )}
           {userProjectsData && (
             <>

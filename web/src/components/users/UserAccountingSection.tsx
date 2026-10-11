@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next";
 import type { UserInfoDTO } from "@/lib/generated-api";
+import { LoadingState, ErrorState, EmptyState } from "@metacentrum/design-system";
 
 interface UserAccountingSectionProps {
   accountingData: UserInfoDTO | null;
@@ -62,7 +63,7 @@ export function UserAccountingSection({
   if (isLoading) {
     return (
       <div className="px-4 sm:px-6 py-4 border-t border-gray-200">
-        <div className="text-gray-500">{t("common.loading")}</div>
+        <LoadingState label={t("common.loading")} />
       </div>
     );
   }
@@ -70,9 +71,10 @@ export function UserAccountingSection({
   if (error) {
     return (
       <div className="px-4 sm:px-6 py-4 border-t border-gray-200">
-        <div className="text-red-600 text-sm">
-          {t("common.errorLoading")}: {error.message}
-        </div>
+        <ErrorState
+          title={t("common.errorLoading")}
+          description={error.message}
+        />
       </div>
     );
   }
@@ -80,9 +82,7 @@ export function UserAccountingSection({
   if (!accountingData) {
     return (
       <div className="px-4 sm:px-6 py-4 border-t border-gray-200">
-        <div className="text-gray-500 text-sm">
-          {t("users.accounting.notAvailable")}
-        </div>
+        <EmptyState title={t("users.accounting.notAvailable")} />
       </div>
     );
   }

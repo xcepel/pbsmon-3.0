@@ -1,7 +1,7 @@
 import { Outlet, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Icon } from "@iconify/react";
-import { Footer, Header, type HeaderNavItem } from "@metacentrum/design-system";
+import { Footer, Header, type HeaderNavItem, LoadingState, ErrorState } from "@metacentrum/design-system";
 // design-system CSS is imported in app.css (needs a layer() qualifier)
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { ImpersonationBanner } from "@/components/common/ImpersonationBanner";
@@ -169,22 +169,23 @@ export function AppLayout() {
         }}
       >
         {isLoading ? (
-          <div className="flex items-center justify-center py-24">
-            <div className="text-lg">{t("common.loading")}</div>
-          </div>
+          <LoadingState label={t("common.loading")} />
         ) : error ? (
-          <div className="flex items-center justify-center py-24">
-            <div className="bg-red-50 border border-red-200 rounded-lg p-6 max-w-md mx-4">
-              <div className="text-red-800">
-                {isUnauthorized
+          <div className="mx-auto max-w-md px-4 py-24">
+            <ErrorState
+              title={
+                isUnauthorized
                   ? t("common.redirectingToLogin")
-                  : `${t("common.errorLoading")} ${
-                      error instanceof Error
-                        ? error.message
-                        : t("common.unknownError")
-                    }`}
-              </div>
-            </div>
+                  : t("common.errorLoading")
+              }
+              description={
+                isUnauthorized
+                  ? undefined
+                  : error instanceof Error
+                    ? error.message
+                    : t("common.unknownError")
+              }
+            />
           </div>
         ) : (
           <Outlet />

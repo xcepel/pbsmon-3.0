@@ -2,6 +2,7 @@ import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { Icon } from "@iconify/react";
 import { useQueueDetail } from "@/hooks/useQueueDetail";
+import { EmptyState, ErrorState, LoadingState } from "@metacentrum/design-system";
 
 interface NodeReservationProps {
   resvId: string;
@@ -24,9 +25,7 @@ export function NodeReservation({
           </div>
         </div>
         <div className="p-4 sm:p-6">
-          <div className="flex items-center justify-center py-12">
-            <div className="text-gray-600">{t("common.loading")}</div>
-          </div>
+          <LoadingState label={t("common.loading")} />
         </div>
       </>
     );
@@ -43,14 +42,14 @@ export function NodeReservation({
           </div>
         </div>
         <div className="p-4 sm:p-6">
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-            <div className="text-red-800">
-              {t("common.errorLoading")}{" "}
-              {error instanceof Error
+          <ErrorState
+            title={t("common.errorLoading")}
+            description={
+              error instanceof Error
                 ? error.message
-                : t("common.unknownError")}
-            </div>
-          </div>
+                : t("common.unknownError")
+            }
+          />
         </div>
       </>
     );
@@ -67,9 +66,7 @@ export function NodeReservation({
           </div>
         </div>
         <div className="p-4 sm:p-6">
-          <div className="text-center text-gray-500 py-12">
-            {t("queues.reservationNotFound")}
-          </div>
+          <EmptyState title={t("queues.reservationNotFound")} />
         </div>
       </>
     );

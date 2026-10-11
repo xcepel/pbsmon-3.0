@@ -3,6 +3,7 @@ import type { UserListDTO } from "@/lib/generated-api";
 import { UsersTableHeader } from "./UsersTableHeader";
 import { UsersTableRow } from "./UsersTableRow";
 import type { SortColumn } from "./types";
+import { EmptyState } from "@metacentrum/design-system";
 
 interface UsersTableProps {
   users: UserListDTO[];
@@ -40,9 +41,7 @@ export function UsersTable({
       {/* Table Body */}
       <div>
         {users.length === 0 ? (
-          <div className="px-4 py-8 text-center text-gray-500">
-            {t("users.noUsersFound")}
-          </div>
+          <EmptyState title={t("users.noUsersFound")} />
         ) : (
           users.map((user) => (
             <UsersTableRow

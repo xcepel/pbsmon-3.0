@@ -5,7 +5,7 @@ import { Pagination } from "@/components/common/Pagination";
 import { ProjectsSearchBar } from "@/components/projects/ProjectsSearchBar";
 import { ProjectsTable } from "@/components/projects/ProjectsTable";
 import type { SortColumn, Project } from "@/components/projects/types";
-import { PageContainer, PageHeader } from "@metacentrum/design-system";
+import { PageContainer, PageHeader, ErrorState, LoadingState } from "@metacentrum/design-system";
 
 export function ProjectsPage() {
   const { t } = useTranslation();
@@ -79,20 +79,18 @@ export function ProjectsPage() {
       />
 
       {isLoading && (
-        <div className="flex items-center justify-center py-12">
-          <div className="text-gray-600">{t("common.loading")}</div>
-        </div>
+        <LoadingState label={t("common.loading")} />
       )}
 
       {error && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-          <div className="text-red-800">
-            {t("common.errorLoading")}{" "}
-            {error instanceof Error
+        <ErrorState
+          title={t("common.errorLoading")}
+          description={
+            error instanceof Error
               ? error.message
-              : t("common.unknownError")}
-          </div>
-        </div>
+              : t("common.unknownError")
+          }
+        />
       )}
 
       {data && (

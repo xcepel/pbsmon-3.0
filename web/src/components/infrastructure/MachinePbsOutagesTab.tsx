@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { useNodeOutages } from "@/hooks/useNodeOutages";
 import type { OutageRecordDTO } from "@/lib/generated-api";
+import { LoadingState, ErrorState, EmptyState } from "@metacentrum/design-system";
 
 interface MachinePbsOutagesTabProps {
   nodeName: string | null;
@@ -72,30 +73,24 @@ export function MachinePbsOutagesTab({ nodeName }: MachinePbsOutagesTabProps) {
   };
 
   if (isLoading) {
-    return (
-      <div className="px-4 sm:px-6 py-4">
-        <div className="text-gray-500">{t("common.loading")}</div>
-      </div>
-    );
+    return <LoadingState label={t("common.loading")} />;
   }
 
   if (error) {
     return (
       <div className="px-4 sm:px-6 py-4">
-        <div className="text-red-600">
-          {t("common.errorLoading")}{" "}
-          {error instanceof Error ? error.message : t("common.unknownError")}
-        </div>
+        <ErrorState
+          title={t("common.errorLoading")}
+          description={
+            error instanceof Error ? error.message : t("common.unknownError")
+          }
+        />
       </div>
     );
   }
 
   if (!outages || outages.length === 0) {
-    return (
-      <div className="px-4 sm:px-6 py-4">
-        <div className="text-gray-500">{t("machines.noOutages")}</div>
-      </div>
-    );
+    return <EmptyState title={t("machines.noOutages")} />;
   }
 
   return (

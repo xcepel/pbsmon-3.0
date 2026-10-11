@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { Tooltip } from "react-tooltip";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import type { ProjectUserDTO } from "@/lib/generated-api";
+import { EmptyState } from "@metacentrum/design-system";
 
 interface ProjectUsersSectionProps {
   users: ProjectUserDTO[];
@@ -25,13 +26,7 @@ export function ProjectUsersSection({ users }: ProjectUsersSectionProps) {
         <h2 className="text-lg font-semibold text-gray-900 mb-4">
           {t("projects.users")}
         </h2>
-        <div className="text-center text-gray-500 py-8">
-          <Icon
-            icon="mdi:account-off"
-            className="w-12 h-12 mx-auto mb-2 text-gray-400"
-          />
-          <p>{t("projects.noUsers")}</p>
-        </div>
+        <EmptyState title={t("projects.noUsers")} />
       </div>
     );
   }

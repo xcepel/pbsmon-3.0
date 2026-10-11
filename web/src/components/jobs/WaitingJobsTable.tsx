@@ -2,6 +2,7 @@ import { useTranslation } from "react-i18next";
 import type { JobListDTO } from "@/lib/generated-api";
 import { WaitingJobsTableHeader } from "./WaitingJobsTableHeader";
 import { WaitingJobsTableRow } from "./WaitingJobsTableRow";
+import { EmptyState } from "@metacentrum/design-system";
 
 type SortColumn =
   | "id"
@@ -40,9 +41,7 @@ export function WaitingJobsTable({
         {/* Table Body */}
         <div>
           {jobs.length === 0 ? (
-            <div className="px-4 py-8 text-center text-gray-500">
-              {t("jobs.noJobsFound")}
-            </div>
+            <EmptyState title={t("jobs.noJobsFound")} />
           ) : (
             jobs.map((job) => <WaitingJobsTableRow key={job.id} job={job} />)
           )}

@@ -2,6 +2,7 @@ import { useTranslation } from "react-i18next";
 import { useInfrastructure } from "@/hooks/useInfrastructure";
 import { NodePreview } from "@/components/infrastructure/NodePreview";
 import type { InfrastructureNodeListDTO } from "@/lib/generated-api";
+import { LoadingState, ErrorState, EmptyState } from "@metacentrum/design-system";
 
 interface QueuePbsMachinesTabProps {
   queueName: string;
@@ -66,30 +67,22 @@ export function QueuePbsMachinesTab({
     : [];
 
   if (isLoading) {
-    return (
-      <div>
-        <div className="text-gray-500">{t("common.loading")}</div>
-      </div>
-    );
+    return <LoadingState label={t("common.loading")} />;
   }
 
   if (error) {
     return (
-      <div>
-        <div className="text-red-600">
-          {t("common.errorLoading")}{" "}
-          {error instanceof Error ? error.message : t("common.unknownError")}
-        </div>
-      </div>
+      <ErrorState
+        title={t("common.errorLoading")}
+        description={
+          error instanceof Error ? error.message : t("common.unknownError")
+        }
+      />
     );
   }
 
   if (machines.length === 0) {
-    return (
-      <div>
-        <div className="text-gray-500">{t("queues.noMachines")}</div>
-      </div>
-    );
+    return <EmptyState title={t("queues.noMachines")} />;
   }
 
   // Group machines by cluster

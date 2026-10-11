@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { Icon } from "@iconify/react";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
+import { EmptyState } from "@metacentrum/design-system";
 
 type ProjectVm = {
   id: string;
@@ -30,13 +31,7 @@ export function ProjectVmsSection({ vms }: ProjectVmsSectionProps) {
         <h2 className="text-lg font-semibold text-gray-900 mb-4">
           {t("projects.vms")}
         </h2>
-        <div className="text-center text-gray-500 py-8">
-          <Icon
-            icon="mdi:server-off"
-            className="w-12 h-12 mx-auto mb-2 text-gray-400"
-          />
-          <p>{t("projects.noVms")}</p>
-        </div>
+        <EmptyState title={t("projects.noVms")} />
       </div>
     );
   }

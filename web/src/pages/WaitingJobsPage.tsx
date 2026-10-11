@@ -6,7 +6,7 @@ import { JobsSearchBar } from "@/components/jobs/JobsSearchBar";
 import { WaitingJobsTable } from "@/components/jobs/WaitingJobsTable";
 import { WaitingJobsSummary } from "@/components/jobs/WaitingJobsSummary";
 import { Pagination } from "@/components/common/Pagination";
-import { PageContainer, PageHeader } from "@metacentrum/design-system";
+import { PageContainer, PageHeader, ErrorState, LoadingState } from "@metacentrum/design-system";
 
 type SortColumn =
   | "id"
@@ -84,20 +84,18 @@ export function WaitingJobsPage() {
     <PageContainer>
       <PageHeader title={t("pages.waitingJobs")} />
       {isLoading && (
-        <div className="flex items-center justify-center py-12">
-          <div className="text-gray-600">{t("common.loading")}</div>
-        </div>
+        <LoadingState label={t("common.loading")} />
       )}
 
       {error && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-          <div className="text-red-800">
-            {t("common.errorLoading")}{" "}
-            {error instanceof Error
+        <ErrorState
+          title={t("common.errorLoading")}
+          description={
+            error instanceof Error
               ? error.message
-              : t("common.unknownError")}
-          </div>
-        </div>
+              : t("common.unknownError")
+          }
+        />
       )}
 
       {data && data.data && (

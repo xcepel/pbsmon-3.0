@@ -3,6 +3,7 @@ import type { JobListDTO } from "@/lib/generated-api";
 import { JobsTableHeader } from "./JobsTableHeader";
 import { JobsTableRow } from "./JobsTableRow";
 import type { JobFilterableState } from "./JobsFilterableHeader";
+import { EmptyState } from "@metacentrum/design-system";
 
 type SortColumn =
   | "id"
@@ -61,9 +62,7 @@ export function JobsTable({
         {/* Table Body */}
         <div>
           {jobs.length === 0 ? (
-            <div className="px-4 py-8 text-center text-gray-500">
-              {t("jobs.noJobsFound")}
-            </div>
+            <EmptyState title={t("jobs.noJobsFound")} />
           ) : (
             jobs.map((job) => (
               <JobsTableRow

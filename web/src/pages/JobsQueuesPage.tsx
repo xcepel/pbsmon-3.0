@@ -7,7 +7,7 @@ import { useMediaQuery } from "@/hooks/useMediaQuery";
 import type { QueueListDTO } from "@/lib/generated-api";
 import { QueueTreeNode } from "@/components/common/QueueTreeNode";
 import { QueuesSearchBar } from "@/components/queues/QueuesSearchBar";
-import { PageContainer, PageHeader } from "@metacentrum/design-system";
+import { PageContainer, PageHeader, ErrorState, LoadingState, EmptyState } from "@metacentrum/design-system";
 
 type SortColumn = "name" | "priority" | "totalJobs" | "fairshare" | "reservationName" | "reservationOwner" | "reservationStart" | "reservationEnd";
 
@@ -219,20 +219,18 @@ export function JobsQueuesPage() {
     <PageContainer>
       <PageHeader title={t("pages.queues")} />
       {(isLoading || resIsLoading) && (
-        <div className="flex items-center justify-center py-12">
-          <div className="text-gray-600">{t("queues.loading")}</div>
-        </div>
+        <LoadingState label={t("queues.loading")} />
       )}
 
       {(error || resError) && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-          <div className="text-red-800">
-            {t("queues.errorLoading")}{" "}
-            {error instanceof Error
+        <ErrorState
+          title={t("queues.errorLoading")}
+          description={
+            error instanceof Error
               ? error.message
-              : t("queues.unknownError")}
-          </div>
-        </div>
+              : t("queues.unknownError")
+          }
+        />
       )}
 
       <QueuesSearchBar searchQuery={search} onSearchChange={setSearch} />
@@ -295,11 +293,13 @@ export function JobsQueuesPage() {
           {/* Table Body */}
           <div>
             {filteredQueues.length === 0 ? (
-              <div className="px-4 py-8 text-center text-gray-500">
-                {debouncedSearch.trim()
-                  ? t("queues.noSearchResults")
-                  : t("queues.noQueuesFound")}
-              </div>
+              <EmptyState
+                title={
+                  debouncedSearch.trim()
+                    ? t("queues.noSearchResults")
+                    : t("queues.noQueuesFound")
+                }
+              />
             ) : (
               filteredQueues.map((queue, index) => (
                 <QueueTreeNode

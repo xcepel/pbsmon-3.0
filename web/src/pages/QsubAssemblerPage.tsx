@@ -2,7 +2,7 @@ import { useTranslation } from "react-i18next";
 import { QsubForm } from "@/components/qsub/QsubForm";
 import { QsubResults } from "@/components/qsub/QsubResults";
 import { useQsubPreview } from "@/hooks/useQsubPreview";
-import { PageContainer, PageHeader } from "@metacentrum/design-system";
+import { PageContainer, PageHeader, LoadingState, ErrorState } from "@metacentrum/design-system";
 
 export function QsubAssemblerPage() {
   const { t } = useTranslation();
@@ -19,17 +19,14 @@ export function QsubAssemblerPage() {
         <QsubForm onSubmit={handleSubmit} />
 
         {previewMutation.isPending && (
-          <div className="flex items-center justify-center p-8">
-            <div className="text-gray-500">Loading results...</div>
-          </div>
+          <LoadingState label="Loading results..." />
         )}
 
         {previewMutation.isError && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-            <div className="text-red-800">
-              Error: {previewMutation.error?.message || "Unknown error"}
-            </div>
-          </div>
+          <ErrorState
+            title="Error"
+            description={previewMutation.error?.message || "Unknown error"}
+          />
         )}
 
         {previewMutation.isSuccess && previewMutation.data && (

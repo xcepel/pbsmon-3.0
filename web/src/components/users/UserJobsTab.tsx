@@ -4,6 +4,7 @@ import { Pagination } from "@/components/common/Pagination";
 import { JobsSearchBar } from "@/components/jobs/JobsSearchBar";
 import type { JobsListDTO, JobsListMetaDto } from "@/lib/generated-api";
 import type { JobFilterableState } from "@/components/jobs/JobsFilterableHeader";
+import { ErrorState, LoadingState } from "@metacentrum/design-system";
 
 type SortColumn =
   | "id"
@@ -69,18 +70,19 @@ export function UserJobsTab({
       />
 
       {isLoading && (
-        <div className="flex items-center justify-center py-12">
-          <div className="text-gray-600">{t("common.loading")}</div>
-        </div>
+        <LoadingState label={t("common.loading")} />
       )}
 
       {error && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
-          <div className="text-red-800">
-            {t("common.errorLoading")}{" "}
-            {error instanceof Error ? error.message : t("common.unknownError")}
-          </div>
-        </div>
+        <ErrorState
+          className="mb-4"
+          title={t("common.errorLoading")}
+          description={
+            error instanceof Error
+              ? error.message
+              : t("common.unknownError")
+          }
+        />
       )}
 
       {jobsData && jobsData.data && (

@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { useGroups } from "@/hooks/useGroups";
-import { PageContainer, PageHeader } from "@metacentrum/design-system";
+import { PageContainer, PageHeader, ErrorState, LoadingState } from "@metacentrum/design-system";
 
 export function GroupsPage() {
   const { t } = useTranslation();
@@ -16,20 +16,18 @@ export function GroupsPage() {
     <PageContainer>
       <PageHeader title={t("pages.groups")} />
       {isLoading && (
-        <div className="flex items-center justify-center py-12">
-          <div className="text-gray-600">{t("common.loading")}</div>
-        </div>
+        <LoadingState label={t("common.loading")} />
       )}
 
       {error && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-          <div className="text-red-800">
-            {t("common.errorLoading")}{" "}
-            {error instanceof Error
+        <ErrorState
+          title={t("common.errorLoading")}
+          description={
+            error instanceof Error
               ? error.message
-              : t("common.unknownError")}
-          </div>
-        </div>
+              : t("common.unknownError")
+          }
+        />
       )}
 
       {data && data.data && (

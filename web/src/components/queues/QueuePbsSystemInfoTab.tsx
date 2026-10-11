@@ -1,4 +1,5 @@
 import { useTranslation } from "react-i18next";
+import { EmptyState } from "@metacentrum/design-system";
 
 interface QueuePbsSystemInfoTabProps {
   rawAttributes: Record<string, string> | null;
@@ -41,7 +42,7 @@ export function QueuePbsSystemInfoTab({
           </table>
         </div>
       ) : (
-        <div className="text-gray-500">{t("queues.noSystemInfo")}</div>
+        <EmptyState title={t("queues.noSystemInfo")} />
       )}
     </div>
   );

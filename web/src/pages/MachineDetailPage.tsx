@@ -4,7 +4,7 @@ import { useParams } from "react-router-dom";
 import { useMachineDetail } from "@/hooks/useMachineDetail";
 import { MachineDetailContent } from "@/components/infrastructure/MachineDetailContent";
 import type { InfrastructureDetailDTO } from "@/lib/generated-api";
-import { PageContainer, PageHeader } from "@metacentrum/design-system";
+import { PageContainer, PageHeader, EmptyState, ErrorState, LoadingState } from "@metacentrum/design-system";
 
 export function MachineDetailPage() {
   const { t } = useTranslation();
@@ -27,9 +27,7 @@ export function MachineDetailPage() {
     return (
       <PageContainer>
         <PageHeader title={t("pages.machineDetail")} />
-        <div className="flex items-center justify-center py-12">
-          <div className="text-gray-600">{t("common.loading")}</div>
-        </div>
+        <LoadingState label={t("common.loading")} />
       </PageContainer>
     );
   }
@@ -38,14 +36,14 @@ export function MachineDetailPage() {
     return (
       <PageContainer>
         <PageHeader title={t("pages.machineDetail")} />
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-          <div className="text-red-800">
-            {t("common.errorLoading")}{" "}
-            {error instanceof Error
+        <ErrorState
+          title={t("common.errorLoading")}
+          description={
+            error instanceof Error
               ? error.message
-              : t("common.unknownError")}
-          </div>
-        </div>
+              : t("common.unknownError")
+          }
+        />
       </PageContainer>
     );
   }
@@ -54,9 +52,7 @@ export function MachineDetailPage() {
     return (
       <PageContainer>
         <PageHeader title={t("pages.machineDetail")} />
-        <div className="text-center text-gray-500 py-12">
-          {t("machines.nodeNotFound")}
-        </div>
+        <EmptyState title={t("machines.nodeNotFound")} />
       </PageContainer>
     );
   }

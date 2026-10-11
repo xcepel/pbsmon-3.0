@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next";
 import type { UserFairshareDTO } from "@/lib/generated-api";
+import { EmptyState } from "@metacentrum/design-system";
 
 interface UserFairshareSectionProps {
   fairsharePerServer: UserFairshareDTO[];
@@ -115,7 +116,7 @@ export function UserFairshareSection({
         </div>
       </div>
       {fairsharePerServer.length === 0 ? (
-        <div className="text-gray-500">{t("users.noFairshareData")}</div>
+        <EmptyState title={t("users.noFairshareData")} />
       ) : (
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">

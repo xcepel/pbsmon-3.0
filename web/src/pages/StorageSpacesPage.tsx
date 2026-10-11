@@ -3,7 +3,7 @@ import { useStorageSpaces } from "@/hooks/useStorageSpaces";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useUserStorageQuotas } from "@/hooks/useUserStorageQuotas";
 import { StorageSpacesContent } from "@/components/storage-spaces/StorageSpacesContent";
-import { PageContainer, PageHeader } from "@metacentrum/design-system";
+import { PageContainer, PageHeader, ErrorState, LoadingState } from "@metacentrum/design-system";
 
 export function StorageSpacesPage() {
   const { t } = useTranslation();
@@ -17,18 +17,18 @@ export function StorageSpacesPage() {
       <PageHeader title={t("pages.storageSpaces")} />
 
       {isLoading && (
-        <div className="flex items-center justify-center py-12">
-          <div className="text-gray-600">{t("common.loading")}</div>
-        </div>
+        <LoadingState label={t("common.loading")} />
       )}
 
       {error && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-          <div className="text-red-800">
-            {t("common.errorLoading")}{" "}
-            {error instanceof Error ? error.message : t("common.unknownError")}
-          </div>
-        </div>
+        <ErrorState
+          title={t("common.errorLoading")}
+          description={
+            error instanceof Error
+              ? error.message
+              : t("common.unknownError")
+          }
+        />
       )}
 
       {data && <StorageSpacesContent data={data} quotasData={quotasData ?? undefined} />}

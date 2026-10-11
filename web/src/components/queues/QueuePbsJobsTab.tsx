@@ -4,6 +4,7 @@ import { JobsTable } from "@/components/jobs/JobsTable";
 import { Pagination } from "@/components/common/Pagination";
 import { JobsSearchBar } from "@/components/jobs/JobsSearchBar";
 import type { JobFilterableState } from "@/components/jobs/JobsFilterableHeader";
+import { ErrorState, LoadingState, EmptyState } from "@metacentrum/design-system";
 
 type SortColumn =
   | "id"
@@ -77,20 +78,19 @@ export function QueuePbsJobsTab({
       />
 
       {jobsLoading && (
-        <div className="flex items-center justify-center py-12">
-          <div className="text-gray-600">{t("common.loading")}</div>
-        </div>
+        <LoadingState label={t("common.loading")} />
       )}
 
       {jobsError && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
-          <div className="text-red-800">
-            {t("common.errorLoading")}{" "}
-            {jobsError instanceof Error
+        <ErrorState
+          className="mb-4"
+          title={t("common.errorLoading")}
+          description={
+            jobsError instanceof Error
               ? jobsError.message
-              : t("common.unknownError")}
-          </div>
-        </div>
+              : t("common.unknownError")
+          }
+        />
       )}
 
       {jobsData && jobsData.data && (
@@ -118,7 +118,7 @@ export function QueuePbsJobsTab({
         !jobsError &&
         jobsData?.data &&
         jobsData.data.jobs.length === 0 && (
-          <div className="text-gray-500">{t("queues.noJobs")}</div>
+          <EmptyState title={t("queues.noJobs")} />
         )}
     </div>
   );

@@ -7,7 +7,7 @@ import { QuickLinksSidebar } from "@/components/infrastructure/QuickLinksSidebar
 import { MachineSearchBar } from "@/components/infrastructure/MachineSearchBar";
 import { MachinesHeader } from "@/components/infrastructure/MachinesHeader";
 import { MachineLegend } from "@/components/infrastructure/MachineLegend";
-import { PageContainer, PageHeader } from "@metacentrum/design-system";
+import { PageContainer, PageHeader, ErrorState, LoadingState } from "@metacentrum/design-system";
 
 export function MachinesPage() {
   const [machineSearch, setMachineSearch] = useState("");
@@ -49,20 +49,18 @@ export function MachinesPage() {
       <div className="flex gap-6">
         <div className="flex-1">
           {filterIsLoading && (
-            <div className="flex items-center justify-center py-12">
-              <div className="text-gray-600">{t("common.loading")}</div>
-            </div>
+            <LoadingState label={t("common.loading")} />
           )}
 
           {filterError && (
-            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-              <div className="text-red-800">
-                {t("common.errorLoading")}{" "}
-                {filterError instanceof Error
+            <ErrorState
+              title={t("common.errorLoading")}
+              description={
+                filterError instanceof Error
                   ? filterError.message
-                  : t("common.unknownError")}
-              </div>
-            </div>
+                  : t("common.unknownError")
+              }
+            />
           )}
 
           {filterData && (
@@ -86,20 +84,18 @@ export function MachinesPage() {
           />
 
           {isLoading && (
-            <div className="flex items-center justify-center py-12">
-              <div className="text-gray-600">{t("common.loading")}</div>
-            </div>
+            <LoadingState label={t("common.loading")} />
           )}
 
           {error && (
-            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-              <div className="text-red-800">
-                {t("common.errorLoading")}{" "}
-                {error instanceof Error
+            <ErrorState
+              title={t("common.errorLoading")}
+              description={
+                error instanceof Error
                   ? error.message
-                  : t("common.unknownError")}
-              </div>
-            </div>
+                  : t("common.unknownError")
+              }
+            />
           )}
 
           {data && (

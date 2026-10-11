@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 import { useQueueDetail } from "@/hooks/useQueueDetail";
 import { QueueDetailContent } from "@/components/queues/QueueDetailContent";
-import { PageContainer, PageHeader } from "@metacentrum/design-system";
+import { PageContainer, PageHeader, EmptyState, ErrorState, LoadingState } from "@metacentrum/design-system";
 
 export function QueueDetailPage() {
   const { t } = useTranslation();
@@ -25,9 +25,7 @@ export function QueueDetailPage() {
     return (
       <PageContainer>
         <PageHeader title={t("pages.queueDetail")} />
-        <div className="flex items-center justify-center py-12">
-          <div className="text-gray-600">{t("common.loading")}</div>
-        </div>
+        <LoadingState label={t("common.loading")} />
       </PageContainer>
     );
   }
@@ -36,14 +34,14 @@ export function QueueDetailPage() {
     return (
       <PageContainer>
         <PageHeader title={t("pages.queueDetail")} />
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-          <div className="text-red-800">
-            {t("common.errorLoading")}{" "}
-            {error instanceof Error
+        <ErrorState
+          title={t("common.errorLoading")}
+          description={
+            error instanceof Error
               ? error.message
-              : t("common.unknownError")}
-          </div>
-        </div>
+              : t("common.unknownError")
+          }
+        />
       </PageContainer>
     );
   }
@@ -52,9 +50,7 @@ export function QueueDetailPage() {
     return (
       <PageContainer>
         <PageHeader title={t("pages.queueDetail")} />
-        <div className="text-center text-gray-500 py-12">
-          {t("queues.queueNotFound")}
-        </div>
+        <EmptyState title={t("queues.queueNotFound")} />
       </PageContainer>
     );
   }

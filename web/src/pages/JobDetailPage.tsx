@@ -9,7 +9,7 @@ import { JobResourcesSection } from "@/components/jobs/JobResourcesSection";
 import { JobSubjobsSection } from "@/components/jobs/JobSubjobsSection";
 import { JobSystemInfoSection } from "@/components/jobs/JobSystemInfoSection";
 import { JobMessagesSection } from "@/components/jobs/JobMessagesSection";
-import { PageContainer, PageHeader } from "@metacentrum/design-system";
+import { PageContainer, PageHeader, EmptyState, ErrorState, LoadingState } from "@metacentrum/design-system";
 
 export function JobDetailPage() {
   const { t } = useTranslation();
@@ -33,9 +33,7 @@ export function JobDetailPage() {
     return (
       <PageContainer>
         <PageHeader title={t("pages.jobDetail")} />
-        <div className="flex items-center justify-center py-12">
-          <div className="text-gray-600">{t("common.loading")}</div>
-        </div>
+        <LoadingState label={t("common.loading")} />
       </PageContainer>
     );
   }
@@ -44,14 +42,14 @@ export function JobDetailPage() {
     return (
       <PageContainer>
         <PageHeader title={t("pages.jobDetail")} />
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-          <div className="text-red-800">
-            {t("common.errorLoading")}{" "}
-            {error instanceof Error
+        <ErrorState
+          title={t("common.errorLoading")}
+          description={
+            error instanceof Error
               ? error.message
-              : t("common.unknownError")}
-          </div>
-        </div>
+              : t("common.unknownError")
+          }
+        />
       </PageContainer>
     );
   }
@@ -60,9 +58,7 @@ export function JobDetailPage() {
     return (
       <PageContainer>
         <PageHeader title={t("pages.jobDetail")} />
-        <div className="text-center text-gray-500 py-12">
-          {t("jobs.jobNotFound")}
-        </div>
+        <EmptyState title={t("jobs.jobNotFound")} />
       </PageContainer>
     );
   }

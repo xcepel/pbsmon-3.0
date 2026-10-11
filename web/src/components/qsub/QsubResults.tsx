@@ -5,6 +5,7 @@ import { NodePreview } from "@/components/infrastructure/NodePreview";
 import type { InfrastructureNodeListDTO } from "@/lib/generated-api";
 import { Tabs } from "@/components/common/Tabs";
 import { MachineLegend } from "@/components/infrastructure/MachineLegend";
+import { EmptyState } from "@metacentrum/design-system";
 
 export interface QualifiedNode extends InfrastructureNodeListDTO {
   canRunImmediately: boolean;
@@ -90,11 +91,13 @@ export function QsubResults({
           </h2>
 
           {qualifiedNodes.length === 0 ? (
-            <div className="text-center py-8 text-gray-500">
-              {currentLang === "cs"
-                ? "Žádné uzly nesplňují zadaná kritéria"
-                : "No nodes match the specified criteria"}
-            </div>
+            <EmptyState
+              title={
+                currentLang === "cs"
+                  ? "Žádné uzly nesplňují zadaná kritéria"
+                  : "No nodes match the specified criteria"
+              }
+            />
           ) : (
             <div className="space-y-6">
               {Object.entries(nodesByCluster).map(([clusterName, nodes]) => (
@@ -148,11 +151,13 @@ export function QsubResults({
           </h2>
 
           {immediatelyAvailableCount === 0 ? (
-            <div className="text-center py-8 text-gray-500">
-              {currentLang === "cs"
-                ? "Žádné uzly nejsou okamžitě dostupné"
-                : "No nodes immediately available"}
-            </div>
+            <EmptyState
+              title={
+                currentLang === "cs"
+                  ? "Žádné uzly nejsou okamžitě dostupné"
+                  : "No nodes immediately available"
+              }
+            />
           ) : (
             <div className="space-y-6">
               {Object.entries(nodesByClusterImmeditely).map(([clusterName, nodes]) => (

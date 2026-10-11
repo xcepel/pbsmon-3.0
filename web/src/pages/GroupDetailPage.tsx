@@ -2,7 +2,7 @@ import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { useParams } from "react-router-dom";
 import { useGroupDetail } from "@/hooks/useGroups";
-import { PageContainer, PageHeader } from "@metacentrum/design-system";
+import { PageContainer, PageHeader, EmptyState, ErrorState, LoadingState } from "@metacentrum/design-system";
 
 export function GroupDetailPage() {
   const { t } = useTranslation();
@@ -24,9 +24,7 @@ export function GroupDetailPage() {
     return (
       <PageContainer>
         <PageHeader title={t("pages.groupDetail")} />
-        <div className="flex items-center justify-center py-12">
-          <div className="text-gray-600">{t("common.loading")}</div>
-        </div>
+        <LoadingState label={t("common.loading")} />
       </PageContainer>
     );
   }
@@ -35,14 +33,14 @@ export function GroupDetailPage() {
     return (
       <PageContainer>
         <PageHeader title={t("pages.groupDetail")} />
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-          <div className="text-red-800">
-            {t("common.errorLoading")}{" "}
-            {error instanceof Error
+        <ErrorState
+          title={t("common.errorLoading")}
+          description={
+            error instanceof Error
               ? error.message
-              : t("common.unknownError")}
-          </div>
-        </div>
+              : t("common.unknownError")
+          }
+        />
       </PageContainer>
     );
   }
@@ -51,9 +49,7 @@ export function GroupDetailPage() {
     return (
       <PageContainer>
         <PageHeader title={t("pages.groupDetail")} />
-        <div className="text-center text-gray-500 py-12">
-          {t("groups.groupNotFound")}
-        </div>
+        <EmptyState title={t("groups.groupNotFound")} />
       </PageContainer>
     );
   }

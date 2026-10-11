@@ -1,8 +1,8 @@
 import { useTranslation } from "react-i18next";
-import { Icon } from "@iconify/react";
 import { ProjectsTableHeader } from "./ProjectsTableHeader";
 import { ProjectsTableRow } from "./ProjectsTableRow";
 import type { SortColumn, Project } from "./types";
+import { EmptyState } from "@metacentrum/design-system";
 
 interface ProjectsTableProps {
   projects: Project[];
@@ -31,14 +31,8 @@ export function ProjectsTable({
           <tbody className="bg-white divide-y divide-gray-200">
             {projects.length === 0 ? (
               <tr>
-                <td colSpan={4} className="px-6 py-8 text-center">
-                  <div className="flex flex-col items-center">
-                    <Icon
-                      icon="mdi:folder-outline"
-                      className="w-16 h-16 text-gray-400 mb-4"
-                    />
-                    <p className="text-gray-600">{t("projects.noProjects")}</p>
-                  </div>
+                <td colSpan={4}>
+                  <EmptyState title={t("projects.noProjects")} />
                 </td>
               </tr>
             ) : (
