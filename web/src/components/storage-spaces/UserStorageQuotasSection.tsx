@@ -36,7 +36,7 @@ export function UserStorageQuotasSection({
     "(max-width: 639px), (max-height: 500px) and (orientation: landscape)"
   );
 
-  // DataTable has no centre alignment: the grace columns are start-aligned.
+  // DataTable can't centre, so grace columns are start-aligned.
   const allColumns: (DataTableColumn<UserStorageQuota> | false)[] = [
     {
       key: "directory",

@@ -13,7 +13,6 @@ interface JobResourcesSectionProps {
 export function JobResourcesSection({ job }: JobResourcesSectionProps) {
   const { t } = useTranslation();
 
-  // GPU/RAM/scratch were hidden below Tailwind's sm breakpoint.
   const isNarrow = useMediaQuery("(max-width: 639px)");
 
   const allAllocatedColumns: (DataTableColumn<AllocatedResourceDTO> | false)[] = [

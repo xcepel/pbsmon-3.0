@@ -119,9 +119,8 @@ interface JobsTableColumnsOptions {
 }
 
 /**
- * Columns of every job list (Jobs page tabs, personal view, user/queue/machine
- * job tabs). In compact view only Status/ID/Created stay visible; the ID cell
- * then also carries the job name.
+ * In compact view only Status/ID/Created stay visible; the ID
+ * cell then also carries the job name.
  */
 export function useJobsTableColumns({
   hideMachineColumn = false,

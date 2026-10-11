@@ -16,7 +16,7 @@ import { UserAccountingSection } from "@/components/users/UserAccountingSection"
 import { UserJobsTab } from "@/components/users/UserJobsTab";
 import { UserQueuesTab } from "@/components/users/UserQueuesTab";
 import type { JobFilterableState } from "@/components/jobs/JobsFilterableHeader";
-import { PageContainer, PageHeader, EmptyState, ErrorState, LoadingState } from "@metacentrum/design-system";
+import { PageContainer, PageHeader, EmptyState, ErrorState, LoadingState, Button } from "@metacentrum/design-system";
 
 type SortColumn =
   | "id"
@@ -200,12 +200,9 @@ export function UserDetailPage() {
         actions={
           // Only for admins
           isAdmin && (
-            <button
-              onClick={handleImpersonate}
-              className="px-3 py-1 text-sm font-medium text-primary-600 hover:text-primary-800 hover:bg-primary-50 rounded border border-primary-300 hover:border-primary-400"
-            >
+            <Button variant="secondary" size="sm" onClick={handleImpersonate}>
               {t("users.impersonate")}
-            </button>
+            </Button>
           )
         }
       />

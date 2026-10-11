@@ -1,7 +1,7 @@
 import { Icon } from "@iconify/react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
-import type { DataTableColumn } from "@metacentrum/design-system";
+import { Button, type DataTableColumn } from "@metacentrum/design-system";
 import type { UserListDTO } from "@/lib/generated-api";
 
 interface UsersTableColumnsOptions {
@@ -123,8 +123,7 @@ export function useUsersTableColumns({
       key: `fairshare-${server}`,
       sortable: true,
       width: "7.5rem",
-      // No grouped (spanning) header in DataTable: label each server column,
-      // with the info tooltip on the first one.
+      // No spanning header: tooltip only on the first server column.
       header: (
         <span className="inline-flex items-center gap-1">
           <span>
@@ -206,16 +205,17 @@ export function useUsersTableColumns({
         header: t("users.actions"),
         width: "8rem",
         render: (user) => (
-          <button
+          <Button
+            variant="secondary"
+            size="sm"
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
               onImpersonate(user.username);
             }}
-            className="px-3 py-1 text-sm font-medium text-primary-600 hover:text-primary-800 hover:bg-primary-50 rounded border border-primary-300 hover:border-primary-400"
           >
             {t("users.impersonate")}
-          </button>
+          </Button>
         ),
       },
   ];

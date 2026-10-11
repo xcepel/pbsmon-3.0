@@ -14,7 +14,6 @@ const formatTimestamp = (timestamp: number | null): string => {
   return `${day}.${month}.${year} ${hours}:${minutes}:${seconds}`;
 };
 
-/** Placeholder for the DataTable search box of job lists (shorter on phones). */
 export function useJobsSearchPlaceholder() {
   const { t } = useTranslation();
   const isMobile = useMediaQuery("(max-width: 639px)");
@@ -24,13 +23,12 @@ export function useJobsSearchPlaceholder() {
 interface JobsTableToolbarProps {
   totalJobs: number;
   lastRunningCompletedBy?: number | null;
-  /** Omit onStateFilterChange to hide the state filter (e.g. waiting jobs). */
+  /** Omit onStateFilterChange to hide the state filter. */
   filterableStates?: Record<string, string> | null;
   stateFilter?: JobFilterableState;
   onStateFilterChange?: (state: JobFilterableState) => void;
 }
 
-/** DataTable toolbar content of job lists: state filter + "Total N jobs". */
 export function JobsTableToolbar({
   totalJobs,
   lastRunningCompletedBy,

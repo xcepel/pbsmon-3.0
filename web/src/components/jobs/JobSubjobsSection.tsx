@@ -12,7 +12,6 @@ interface JobSubjobsSectionProps {
 export function JobSubjobsSection({ subjobs }: JobSubjobsSectionProps) {
   const { t } = useTranslation();
 
-  // Below the sm breakpoint only ID and state are shown (as before)
   const isNarrow = useMediaQuery("(max-width: 639px)");
 
   const columns: DataTableColumn<SubjobDTO>[] = [

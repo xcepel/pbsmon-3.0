@@ -12,7 +12,6 @@ import {
   type DataTableSort,
 } from "@metacentrum/design-system";
 
-// The projects list always used a fixed page size of 20.
 const PROJECTS_PAGE_SIZES = [20];
 
 export function ProjectsPage() {
@@ -25,8 +24,7 @@ export function ProjectsPage() {
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
 
-  // Compact view covers narrow-width phones (portrait) as well as short-height
-  // phones in landscape.
+  // Includes short landscape phones, not only narrow ones.
   const isCompact = useMediaQuery(
     "(max-width: 639px), (max-height: 500px) and (orientation: landscape)"
   );
@@ -49,8 +47,7 @@ export function ProjectsPage() {
     search: debouncedSearch.trim() || undefined,
   });
 
-  // DataTable picks the direction: toggles on the same column, desc first for
-  // the numeric (reserved resources) column, asc otherwise.
+  // DataTable picks the direction (firstSortDirection).
   const handleSortChange = (next: DataTableSort) => {
     setSort(next.key as SortColumn);
     setOrder(next.direction);

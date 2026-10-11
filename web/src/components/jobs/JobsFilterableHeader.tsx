@@ -1,8 +1,6 @@
 import { useTranslation } from "react-i18next";
 
-// The file keeps its old name because JobFilterableState is imported from here
-// by the queue/machine/user detail pages. The filter itself used to sit in the
-// Status column header; with the shared DataTable it lives in the table toolbar.
+// Old file name kept: detail pages import JobFilterableState.
 
 export type JobFilterableState = "all" | "Q" | "R|B" | "C|F|X" | "E" | "H" | "S" | "T|M" | "W";
 

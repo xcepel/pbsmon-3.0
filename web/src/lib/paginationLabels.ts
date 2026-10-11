@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import type { PaginationLabels } from "@metacentrum/design-system";
 
-/** Translated Carbon pagination texts for the design-system Pagination/DataTable. */
+/** Translated Carbon pagination texts. */
 export function usePaginationLabels(): PaginationLabels {
   const { t, i18n } = useTranslation();
 

@@ -305,7 +305,7 @@ export function JobsPage() {
             />
           )}
 
-          {/* Remount on reason filter change so the search box shows the cleared search */}
+          {/* Remount on filter change to clear the search box */}
           <WaitingJobsTable
             key={commentFilter ?? ""}
             jobs={waitingJobsData?.data?.jobs ?? []}

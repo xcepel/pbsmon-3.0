@@ -8,15 +8,12 @@ interface ProjectsTableProps {
   projects: Project[];
   sortColumn: SortColumn;
   sortDirection: "asc" | "desc";
-  /** Called with the clicked column; the caller decides the direction. */
+  /** The caller decides the sort direction. */
   onSort: (column: SortColumn) => void;
   pagination?: PaginationProps;
 }
 
-/**
- * Projects list without search (callers render it). The
- * projects page uses DataTable directly with useProjectsTableColumns.
- */
+/** No search box; callers render their own. */
 export function ProjectsTable({
   projects,
   sortColumn,

@@ -16,7 +16,7 @@ interface JobsDataTableBaseProps<S extends string> {
 
   sortColumn: S;
   sortDirection: "asc" | "desc";
-  /** Same contract as before: the caller toggles the order for the same column, new column starts desc. */
+  /** Caller toggles same column; a new column starts desc. */
   onSort: (column: S) => void;
 
   search: string;
@@ -119,7 +119,6 @@ interface JobsTableProps<S extends string> extends JobsDataTableBaseProps<S> {
   onStateFilterChange?: (state: JobFilterableState) => void;
 }
 
-/** Job list (DataTable): state filter + total count in the toolbar, server-side sort/search/paging. */
 export function JobsTable<S extends string>({
   hideMachineColumn,
   hideUserColumn,
@@ -135,10 +134,9 @@ export function JobsTable<S extends string>({
   );
 }
 
-/** Waiting (queued) jobs list: waiting-reason column, no state filter. */
 export function WaitingJobsTable<S extends string>(props: JobsDataTableBaseProps<S>) {
   const columns = useWaitingJobsTableColumns();
-  // Waiting jobs never showed the "completed by" estimate, just the plain total.
+  // No "completed by" estimate for waiting jobs.
   return (
     <JobsDataTable
       {...props}

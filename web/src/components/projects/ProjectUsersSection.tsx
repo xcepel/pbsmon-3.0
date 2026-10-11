@@ -10,7 +10,7 @@ interface ProjectUsersSectionProps {
   users: ProjectUserDTO[];
 }
 
-// Generated types allow non-string values; normalise them once per row.
+// Generated types allow non-strings; normalise per row.
 interface ProjectUserRow {
   key: string;
   isFoundInPerun: boolean;

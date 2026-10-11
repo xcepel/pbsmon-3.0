@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import type { DataTableColumn } from "@metacentrum/design-system";
 import type { Project } from "./types";
 
-/** Columns for the projects list (keys are the API sort columns). */
+/** Column keys are the API sort columns. */
 export function useProjectsTableColumns(
   isCompact: boolean
 ): DataTableColumn<Project>[] {

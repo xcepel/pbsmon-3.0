@@ -14,7 +14,6 @@ import {
   type DataTableSort,
 } from "@metacentrum/design-system";
 
-// The users list always used a fixed page size of 20.
 const USERS_PAGE_SIZES = [20];
 
 export function UsersPage() {
@@ -31,8 +30,7 @@ export function UsersPage() {
   const { impersonate } = useImpersonation();
   const isAdmin = currentUser?.role === "admin";
 
-  // Compact view covers narrow-width phones (portrait) as well as short-height
-  // phones in landscape.
+  // Includes short landscape phones, not only narrow ones.
   const isCompact = useMediaQuery(
     "(max-width: 639px), (max-height: 500px) and (orientation: landscape)"
   );

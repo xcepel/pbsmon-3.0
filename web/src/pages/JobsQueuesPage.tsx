@@ -206,8 +206,6 @@ export function JobsQueuesPage() {
     }
   };
 
-  // DataTable toggles the same column and starts a new one at desc
-  // (firstSortDirection), as the old header did.
   const handleResSortChange = (next: DataTableSort) => {
     setResSort(next.key as SortColumn);
     setResOrder(next.direction);

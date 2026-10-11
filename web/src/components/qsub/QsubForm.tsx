@@ -6,7 +6,7 @@ import Select from "react-select";
 import { Tooltip } from "react-tooltip";
 import { Icon } from "@iconify/react";
 import type { QsubFieldConfigDto } from "@/lib/generated-api";
-import { LoadingState, ErrorState } from "@metacentrum/design-system";
+import { LoadingState, ErrorState, Button } from "@metacentrum/design-system";
 
 interface QsubFormValues {
   [key: string]: any;
@@ -553,12 +553,9 @@ export function QsubForm({ onSubmit }: QsubFormProps) {
 
       {/* Submit Button */}
       <div className="flex justify-end">
-        <button
-          type="submit"
-          className="px-6 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-colors"
-        >
+        <Button type="submit" variant="primary">
           {currentLang === "cs" ? "Zobrazit výsledky" : "Show Results"}
-        </button>
+        </Button>
       </div>
     </form>
   );

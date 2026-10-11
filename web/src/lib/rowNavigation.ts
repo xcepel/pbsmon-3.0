@@ -2,10 +2,7 @@ import { useCallback } from "react";
 import type { KeyboardEvent, MouseEvent } from "react";
 import { useNavigate } from "react-router-dom";
 
-/**
- * Handler for DataTable's onRowClick: navigates in-app, or opens a new tab on
- * ctrl/cmd-click or middle-click.
- */
+/** onRowClick handler; ctrl/cmd/middle-click opens a new tab. */
 export function useRowNavigate() {
   const navigate = useNavigate();
 

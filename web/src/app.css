@@ -9,7 +9,6 @@
 @import "tailwindcss";
 @import "@metacentrum/design-system/tailwind-theme.css";
 
-/* Primary and secondary colors from the design system */
 @theme inline {
   --color-primary: var(--mc-color-brand-400);
   --color-primary-50: var(--mc-color-brand-50);

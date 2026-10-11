@@ -99,7 +99,7 @@ export function MachinePbsOutagesTab({ nodeName }: MachinePbsOutagesTabProps) {
     return <EmptyState title={t("machines.noOutages")} />;
   }
 
-  // Outage records have no id; key by position in the (unsorted) API list.
+  // Outages have no id; rows are keyed by API list index.
   const columns: DataTableColumn<OutageRecordDTO>[] = [
     {
       key: "type",
