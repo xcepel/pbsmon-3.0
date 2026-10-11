@@ -7,6 +7,36 @@
 @import "@metacentrum/design-system/foundation.css" layer(carbon);
 @import "@metacentrum/design-system/styles.css";
 @import "tailwindcss";
+@import "@metacentrum/design-system/tailwind-theme.css";
+
+/* Primary and secondary colors from the design system */
+@theme inline {
+  --color-primary: var(--mc-color-brand-400);
+  --color-primary-50: var(--mc-color-brand-50);
+  --color-primary-100: var(--mc-color-brand-100);
+  --color-primary-200: var(--mc-color-brand-200);
+  --color-primary-300: var(--mc-color-brand-300);
+  --color-primary-400: var(--mc-color-brand-400);
+  --color-primary-500: var(--mc-color-brand-500);
+  --color-primary-600: var(--mc-color-brand-600);
+  --color-primary-700: var(--mc-color-brand-700);
+  --color-primary-800: var(--mc-color-brand-800);
+  --color-primary-900: var(--mc-color-brand-900);
+  --color-primary-950: var(--mc-color-brand-950);
+
+  --color-secondary: var(--mc-color-brand-400);
+  --color-secondary-50: var(--mc-color-brand-50);
+  --color-secondary-100: var(--mc-color-brand-100);
+  --color-secondary-200: var(--mc-color-brand-200);
+  --color-secondary-300: var(--mc-color-brand-300);
+  --color-secondary-400: var(--mc-color-brand-400);
+  --color-secondary-500: var(--mc-color-brand-500);
+  --color-secondary-600: var(--mc-color-brand-600);
+  --color-secondary-700: var(--mc-color-brand-700);
+  --color-secondary-800: var(--mc-color-brand-800);
+  --color-secondary-900: var(--mc-color-brand-900);
+  --color-secondary-950: var(--mc-color-brand-950);
+}
 
 html {
   font-size: 14px;
@@ -23,34 +53,6 @@ html {
 }
 
 @theme {
-  /* Primary colors - Gray-blue */
-  --color-primary: #82909e;
-  --color-primary-50: #f5f7f8;
-  --color-primary-100: #e8ecef;
-  --color-primary-200: #d1d9df;
-  --color-primary-300: #b0bec8;
-  --color-primary-400: #82909e;
-  --color-primary-500: #6b7a8a;
-  --color-primary-600: #5d7083;
-  --color-primary-700: #4f5f70;
-  --color-primary-800: #434f5d;
-  --color-primary-900: #3a444e;
-  --color-primary-950: #1f2529;
-
-  /* Secondary colors - Orange */
-  --color-secondary: #f17a30;
-  --color-secondary-50: #fef5f0;
-  --color-secondary-100: #fde6d7;
-  --color-secondary-200: #fac9af;
-  --color-secondary-300: #f6a37c;
-  --color-secondary-400: #f17a30;
-  --color-secondary-500: #e85f0c;
-  --color-secondary-600: #d94a08;
-  --color-secondary-700: #b5380a;
-  --color-secondary-800: #922e0f;
-  --color-secondary-900: #782a10;
-  --color-secondary-950: #401206;
-
   /* Neutral colors */
   --color-gray-dark: #5d7083;
   --color-gray-light: #f5f5f5;
